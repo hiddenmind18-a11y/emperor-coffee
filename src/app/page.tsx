@@ -200,7 +200,7 @@ export default function POSDashboard() {
     }
   };
 
-  // Initialize offline manager and fetch data (only once per branch)
+  // Initialize offline manager (NO AUTO-SYNC to prevent massive data transfers)
   useEffect(() => {
     if (user && user.branchId) {
       // Only initialize offline manager if user has a branch (not HQ admin)
@@ -211,25 +211,20 @@ export default function POSDashboard() {
           // Initialize services - offline manager will initialize localStorageService internally
           await offlineManager.initialize(user.branchId);
 
-          // Check if online before attempting sync
-          const isOnline = offlineManager.isCurrentlyOnline();
+          // DISABLED: Auto-sync on login causes massive data transfers (200MB+)
+          // Users can manually sync by clicking the "Sync" button in the header
+          //
+          // const isOnline = offlineManager.isCurrentlyOnline();
+          // if (isOnline) {
+          //   console.log('[Dashboard] Online, triggering sync...');
+          //   const syncResult = await offlineManager.syncAll();
+          //   console.log('[Dashboard] Sync completed:', syncResult);
+          // }
+          //
+          // Instead, we'll let the POS components fetch only the data they need
+          // via the useOfflineData hook which uses optimized endpoints
 
-          if (isOnline) {
-            console.log('[Dashboard] Online, triggering sync...');
-            // Trigger sync immediately
-            const syncResult = await offlineManager.syncAll();
-
-            console.log('[Dashboard] Sync completed:', syncResult);
-
-            if (syncResult.success) {
-              console.log(`[Dashboard] Sync successful: ${syncResult.operationsProcessed} operations processed`);
-            } else if (syncResult.errors.length > 0 && !syncResult.errors.some(e => e.includes('already in progress'))) {
-              // Only log errors if they're not "already in progress" (which is expected)
-              console.error('[Dashboard] Sync failed:', syncResult.errors);
-            }
-          } else {
-            console.log('[Dashboard] Currently offline - skipping sync, data available from cache');
-          }
+          console.log('[Dashboard] Offline manager initialized (auto-sync disabled)');
         } catch (err) {
           console.error('[Dashboard] Failed to initialize offline manager:', err);
         }

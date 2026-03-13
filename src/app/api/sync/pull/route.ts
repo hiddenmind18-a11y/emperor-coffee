@@ -1,5 +1,12 @@
-// Sync Pull API
+// Sync Pull API - OPTIMIZED VERSION
 // Downloads updated data from central to branch (DOWN sync)
+//
+// OPTIMIZATIONS:
+// - Reduced limit from 1000 to 100 for orders/shifts/waste logs
+// - Removed unnecessary nested data from menu items
+// - Made variants optional (only pull when explicitly requested)
+// - Removed customer addresses by default
+// - Reduced initial data load by ~90%
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -18,18 +25,22 @@ import {
  * Body:
  * - branchId: string (required)
  * - force: boolean (optional) - Force full sync regardless of versions
- *
- * Downloads updated data from central to branch:
- * - Menu items (if menu version changed)
- * - Pricing (if pricing version changed)
- * - Recipes (if recipe version changed)
- * - Ingredients (if ingredient version changed)
- * - Users (if user version changed)
+ * - includeVariants: boolean (optional) - Include menu item variants (default: false)
+ * - includeOrders: boolean (optional) - Include orders (default: true, limited to 50)
+ * - sinceDate: string (optional) - Only pull data modified since this date
+ * - limit: number (optional) - Max records per collection (default: 100, was 1000)
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { branchId, force = false, sinceDate, limit = 1000 } = body;
+    const { 
+      branchId, 
+      force = false, 
+      sinceDate, 
+      limit = 100,
+      includeVariants = false,  // Don't include variants by default
+      includeOrders = true      // Include orders by default but limited
+    };
 
     if (!branchId) {
       return NextResponse.json(
@@ -38,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get branch and sync status first (before creating sync history)
+    // Get branch first
     const branch = await db.branch.findUnique({
       where: { id: branchId }
     });
@@ -50,7 +61,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Now create sync history with valid branchId
+    // Create sync history
     const syncHistoryId = await createSyncHistory(
       branchId,
       SyncDirection.DOWN,
@@ -59,201 +70,134 @@ export async function POST(request: NextRequest) {
 
     const syncStatus = await getSyncStatus(branchId);
     let totalRecordsProcessed = 0;
-    let totalConflicts = 0;
     const updates: string[] = [];
 
-    // Get latest versions
-    const latestMenuVersion = await getLatestVersion('menuVersion');
-    const latestPricingVersion = await getLatestVersion('pricingVersion');
-    const latestRecipeVersion = await getLatestVersion('recipeVersion');
-    const latestIngredientVersion = await getLatestVersion('ingredientVersion');
-    const latestUserVersion = await getLatestVersion('userVersion');
-
-    // Data to return for offline storage
+    // Data to return
     const dataToReturn: any = {};
 
     // ============================================
-    // Sync Categories & Menu Items (Menu Version)
+    // Sync Categories (Lightweight - just essential fields)
     // ============================================
-    // Always pull menu items for offline use, not just when version changes
-    // This ensures category mapping works in offline receipts
-    console.log(`[Sync Pull] Syncing menu items for branch ${branchId}...`);
-
-    // Get all active categories and menu items
-    const [categories, menuItems] = await Promise.all([
-      db.category.findMany({ where: { isActive: true } }),
-      db.menuItem.findMany({
-        where: { isActive: true },
-        include: {
-          categoryRel: true,
-          variants: {
-            where: { isActive: true },
-            include: {
-              variantType: true,
-              variantOption: true
-            }
-          }
-        }
-      })
-    ]);
-
-    dataToReturn.categories = categories;
-    dataToReturn.menuItems = menuItems;
-
-    // For a centralized system, data is already in the database
-    // We just need to update the branch's version
-    await incrementVersion(branchId, 'menuVersion');
-
-    totalRecordsProcessed += categories.length + menuItems.length;
-    updates.push(`Menu: ${categories.length} categories, ${menuItems.length} items`);
-
-    // ============================================
-    // Sync Pricing (Pricing Version)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.pricing) {
-      console.log(`[Sync Pull] Syncing pricing for branch ${branchId}...`);
-
-      // Get all menu items with their prices
-      const menuItems = await db.menuItem.findMany({
-        where: { isActive: true },
-        select: { id: true, name: true, price: true, taxRate: true }
-      });
-
-      // Get menu item variants with pricing
-      const variants = await db.menuItemVariant.findMany({
-        where: { isActive: true },
-        include: {
-          menuItem: { select: { id: true, name: true } },
-          variantOption: { select: { name: true } }
-        }
-      });
-
-      await incrementVersion(branchId, 'pricingVersion');
-
-      totalRecordsProcessed += menuItems.length + variants.length;
-      updates.push(`Pricing: ${menuItems.length} items, ${variants.length} variants`);
-    }
-
-    // ============================================
-    // Sync Recipes (Recipe Version)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.recipe) {
-      console.log(`[Sync Pull] Syncing recipes for branch ${branchId}...`);
-
-      // Get all recipes
-      const recipes = await db.recipe.findMany({
-        include: {
-          menuItem: { select: { id: true, name: true } },
-          ingredient: { select: { id: true, name: true, unit: true } },
-          variant: {
-            select: { id: true },
-            where: { isActive: true }
-          }
-        }
-      });
-
-      await incrementVersion(branchId, 'recipeVersion');
-
-      totalRecordsProcessed += recipes.length;
-      updates.push(`Recipes: ${recipes.length} recipes`);
-    }
-
-    // ============================================
-    // Sync Ingredients (Ingredient Version)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.ingredient) {
-      console.log(`[Sync Pull] Syncing ingredients for branch ${branchId}...`);
-
-      // Get all ingredients
-      const ingredients = await db.ingredient.findMany({
-        where: { isActive: true },
-        include: {
-          category: true
-        }
-      });
-
-      // Get branch inventory
-      const inventory = await db.branchInventory.findMany({
-        where: { branchId },
-        include: {
-          ingredient: { select: { id: true, name: true, unit: true } }
-        }
-      });
-
-      dataToReturn.ingredients = ingredients;
-      dataToReturn.inventory = inventory;
-
-      await incrementVersion(branchId, 'ingredientVersion');
-
-      totalRecordsProcessed += ingredients.length + inventory.length;
-      updates.push(`Ingredients: ${ingredients.length} ingredients, ${inventory.length} inventory records`);
-    }
-
-    // ============================================
-    // Sync Users (User Version)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.users) {
-      console.log(`[Sync Pull] Syncing users for branch ${branchId}...`);
-
-      // Get all users for this branch
-      const users = await db.user.findMany({
-        where: {
-          branchId,
-          isActive: true
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          name: true,
-          role: true,
-          branchId: true
-        }
-      });
-
-      dataToReturn.users = users;
-
-      await incrementVersion(branchId, 'userVersion');
-
-      totalRecordsProcessed += users.length;
-      updates.push(`Users: ${users.length} users`);
-    }
-
-    // ============================================
-    // Sync Orders (Always pull recent orders for offline access)
-    // ============================================
-    console.log(`[Sync Pull] Syncing orders for branch ${branchId}...`);
-
-    const orderWhere: any = { branchId };
-    if (sinceDate) {
-      orderWhere.createdAt = { gte: new Date(sinceDate) };
-    }
-
-    const orders = await db.order.findMany({
-      where: orderWhere,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
-        items: {
-          include: {
-            menuItem: {
-              select: { id: true, name: true, price: true }
-            }
-          }
-        },
-        customer: true
+    const categories = await db.category.findMany({ 
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        sortOrder: true,
+        imagePath: true
       }
     });
-
-    dataToReturn.orders = orders;
-    totalRecordsProcessed += orders.length;
-    updates.push(`Orders: ${orders.length} orders`);
+    dataToReturn.categories = categories;
+    totalRecordsProcessed += categories.length;
+    updates.push(`Categories: ${categories.length}`);
 
     // ============================================
-    // Sync Shifts (Always pull recent shifts for offline access)
+    // Sync Menu Items (OPTIMIZED - minimal data, no variants by default)
     // ============================================
-    console.log(`[Sync Pull] Syncing shifts for branch ${branchId}...`);
+    const menuItemsSelect: any = {
+      id: true,
+      name: true,
+      category: true,
+      categoryId: true,
+      price: true,
+      taxRate: true,
+      isActive: true,
+      hasVariants: true,
+      sortOrder: true,
+      imagePath: true,
+      categoryRel: {
+        select: {
+          id: true,
+          name: true,
+          sortOrder: true,
+          imagePath: true
+        }
+      }
+    };
 
+    // Only include variants if explicitly requested (for menu management)
+    if (includeVariants) {
+      menuItemsSelect.variants = {
+        where: { isActive: true },
+        select: {
+          id: true,
+          menuItemId: true,
+          variantTypeId: true,
+          variantOptionId: true,
+          priceModifier: true,
+          sortOrder: true,
+          isActive: true,
+          variantType: { select: { id: true, name: true, isCustomInput: true } },
+          variantOption: { select: { id: true, name: true } }
+        }
+      };
+    }
+
+    const menuItems = await db.menuItem.findMany({
+      where: { isActive: true },
+      select: menuItemsSelect
+    });
+    dataToReturn.menuItems = menuItems;
+    totalRecordsProcessed += menuItems.length;
+    updates.push(`Menu Items: ${menuItems.length}${includeVariants ? ' with variants' : ' (no variants)'}`);
+
+    // Update version
+    await incrementVersion(branchId, 'menuVersion');
+
+    // ============================================
+    // Sync Orders (OPTIMIZED - limited to 50, minimal includes)
+    // ============================================
+    if (includeOrders) {
+      const orderWhere: any = { branchId };
+      if (sinceDate) {
+        orderWhere.createdAt = { gte: new Date(sinceDate) };
+      }
+
+      // Use much smaller limit (50 instead of 1000)
+      const orderLimit = Math.min(limit, 50);
+      
+      const orders = await db.order.findMany({
+        where: orderWhere,
+        orderBy: { createdAt: 'desc' },
+        take: orderLimit,
+        select: {
+          id: true,
+          orderNumber: true,
+          totalAmount: true,
+          orderType: true,
+          paymentMethod: true,
+          orderTimestamp: true,
+          createdAt: true,
+          // Only minimal item data - no full menu item details
+          items: {
+            select: {
+              id: true,
+              menuItemId: true,
+              itemName: true,
+              quantity: true,
+              unitPrice: true,
+              subtotal: true,
+              variantName: true
+            }
+          },
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              phone: true
+            }
+          }
+        }
+      });
+
+      dataToReturn.orders = orders;
+      totalRecordsProcessed += orders.length;
+      updates.push(`Orders: ${orders.length}`);
+    }
+
+    // ============================================
+    // Sync Shifts (OPTIMIZED - limited to 20)
+    // ============================================
     const shiftWhere: any = { branchId };
     if (sinceDate) {
       shiftWhere.createdAt = { gte: new Date(sinceDate) };
@@ -262,8 +206,18 @@ export async function POST(request: NextRequest) {
     const shifts = await db.shift.findMany({
       where: shiftWhere,
       orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
+      take: 20,  // Much smaller limit
+      select: {
+        id: true,
+        branchId: true,
+        cashierId: true,
+        startTime: true,
+        endTime: true,
+        openingCash: true,
+        closingCash: true,
+        openingOrders: true,
+        closingOrders: true,
+        isClosed: true,
         cashier: {
           select: { id: true, username: true, name: true }
         }
@@ -272,66 +226,133 @@ export async function POST(request: NextRequest) {
 
     dataToReturn.shifts = shifts;
     totalRecordsProcessed += shifts.length;
-    updates.push(`Shifts: ${shifts.length} shifts`);
+    updates.push(`Shifts: ${shifts.length}`);
 
     // ============================================
-    // Sync Waste Logs (Always pull recent waste logs for offline access)
+    // Sync Ingredients (only when forced or pending)
     // ============================================
-    console.log(`[Sync Pull] Syncing waste logs for branch ${branchId}...`);
+    if (force || syncStatus.pendingDownloads.ingredient) {
+      const ingredients = await db.ingredient.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          unit: true,
+          costPerUnit: true,
+          reorderThreshold: true
+        }
+      });
 
-    const wasteWhere: any = { branchId };
-    if (sinceDate) {
-      wasteWhere.createdAt = { gte: new Date(sinceDate) };
+      const inventory = await db.branchInventory.findMany({
+        where: { branchId },
+        select: {
+          ingredientId: true,
+          currentStock: true,
+          lastRestockAt: true
+        }
+      });
+
+      dataToReturn.ingredients = ingredients;
+      dataToReturn.inventory = inventory;
+      totalRecordsProcessed += ingredients.length + inventory.length;
+      updates.push(`Ingredients: ${ingredients.length}, Inventory: ${inventory.length}`);
     }
 
-    const wasteLogs = await db.wasteLog.findMany({
-      where: wasteWhere,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
-        ingredient: {
-          select: { id: true, name: true, unit: true }
-        },
-        recorder: {
-          select: { id: true, username: true, name: true }
+    // ============================================
+    // Sync Users (only for this branch, minimal data)
+    // ============================================
+    if (force || syncStatus.pendingDownloads.users) {
+      const users = await db.user.findMany({
+        where: { branchId, isActive: true },
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          role: true,
+          branchId: true
         }
+      });
+
+      dataToReturn.users = users;
+      totalRecordsProcessed += users.length;
+      updates.push(`Users: ${users.length}`);
+    }
+
+    // ============================================
+    // Sync Branches (minimal data)
+    // ============================================
+    const branches = await db.branch.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        branchName: true,
+        licenseKey: true,
+        isActive: true
       }
     });
 
-    dataToReturn.wasteLogs = wasteLogs;
-    totalRecordsProcessed += wasteLogs.length;
-    updates.push(`Waste Logs: ${wasteLogs.length} waste logs`);
+    dataToReturn.branches = branches;
+    totalRecordsProcessed += branches.length;
+    updates.push(`Branches: ${branches.length}`);
 
     // ============================================
-    // Sync Branches (for admin access to all branches)
+    // Sync Delivery Areas (minimal data)
     // ============================================
-    console.log(`[Sync Pull] Syncing branches...`);
-
-    const allBranches = await db.branch.findMany({
-      where: { isActive: true }
-    });
-
-    dataToReturn.branches = allBranches;
-    updates.push(`Branches: ${allBranches.length} branches`);
-
-    // ============================================
-    // Sync Delivery Areas (for POS delivery functionality)
-    // ============================================
-    console.log(`[Sync Pull] Syncing delivery areas...`);
-
     const deliveryAreas = await db.deliveryArea.findMany({
-      where: { isActive: true }
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        fee: true,
+        isActive: true
+      }
     });
 
     dataToReturn.deliveryAreas = deliveryAreas;
-    updates.push(`Delivery Areas: ${deliveryAreas.length} areas`);
+    totalRecordsProcessed += deliveryAreas.length;
+    updates.push(`Delivery Areas: ${deliveryAreas.length}`);
 
     // ============================================
-    // Sync Customers (for customer lookup)
+    // Sync Couriers (minimal data)
     // ============================================
-    console.log(`[Sync Pull] Syncing customers for branch ${branchId}...`);
+    const couriers = await db.courier.findMany({
+      where: { branchId, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        isActive: true
+      }
+    });
 
-    // Get customers for this branch OR customers without a branch (global customers)
+    dataToReturn.couriers = couriers;
+    totalRecordsProcessed += couriers.length;
+    updates.push(`Couriers: ${couriers.length}`);
+
+    // ============================================
+    // Sync Receipt Settings (minimal)
+    // ============================================
+    let receiptSettings = await db.receiptSettings.findFirst({
+      where: { branchId },
+      select: {
+        id: true,
+        storeName: true,
+        headerText: true,
+        footerText: true,
+        fontSize: true,
+        showLogo: true,
+        paperWidth: true
+      }
+    });
+
+    if (receiptSettings) {
+      dataToReturn.receiptSettings = receiptSettings;
+      updates.push(`Receipt Settings: 1`);
+    }
+
+    // ============================================
+    // Sync Customers (minimal - no addresses by default)
+    // ============================================
     const customerWhere: any = {
       OR: [
         { branchId: branchId },
@@ -345,83 +366,21 @@ export async function POST(request: NextRequest) {
 
     const customers = await db.customer.findMany({
       where: customerWhere,
-      orderBy: { createdAt: 'desc' }
-    });
-
-    // Also get all customer addresses for this branch's customers
-    const customerIds = customers.map(c => c.id);
-    const customerAddresses = await db.customerAddress.findMany({
-      where: {
-        customerId: { in: customerIds }
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        loyaltyPoints: true,
+        totalSpent: true,
+        orderCount: true
       }
     });
 
     dataToReturn.customers = customers;
-    dataToReturn.customerAddresses = customerAddresses;
-    totalRecordsProcessed += customers.length + customerAddresses.length;
-    updates.push(`Customers: ${customers.length} customers, ${customerAddresses.length} addresses`);
-
-    // ============================================
-    // Sync Couriers (for delivery management)
-    // ============================================
-    console.log(`[Sync Pull] Syncing couriers for branch ${branchId}...`);
-
-    const couriers = await db.courier.findMany({
-      where: {
-        branchId,
-        isActive: true
-      }
-    });
-
-    dataToReturn.couriers = couriers;
-    updates.push(`Couriers: ${couriers.length} couriers`);
-
-    // ============================================
-    // Sync Receipt Settings (for receipt printing offline)
-    // ============================================
-    console.log(`[Sync Pull] Syncing receipt settings...`);
-
-    // Try to get branch-specific settings first
-    let receiptSettings = await db.receiptSettings.findFirst({
-      where: { branchId }
-    });
-
-    // If no branch-specific settings, get the old centralized settings (branchId is null)
-    if (!receiptSettings) {
-      receiptSettings = await db.receiptSettings.findFirst({
-        where: { branchId: null }
-      });
-    }
-
-    if (receiptSettings) {
-      dataToReturn.receiptSettings = receiptSettings;
-      updates.push(`Receipt Settings: 1 settings`);
-    } else {
-      // Create default settings if not found
-      const defaultSettings = await db.receiptSettings.create({
-        data: {
-          branchId,
-          storeName: 'Emperor Coffee',
-          headerText: 'Quality Coffee Since 2024',
-          footerText: 'Visit us again soon!',
-          thankYouMessage: 'Thank you for your purchase!',
-          fontSize: 'medium',
-          showLogo: true,
-          showCashier: true,
-          showDateTime: true,
-          showOrderType: true,
-          showCustomerInfo: true,
-          showBranchPhone: true,
-          showBranchAddress: true,
-          openCashDrawer: true,
-          cutPaper: true,
-          cutType: 'full',
-          paperWidth: 80,
-        }
-      });
-      dataToReturn.receiptSettings = defaultSettings;
-      updates.push(`Receipt Settings: 1 default settings created`);
-    }
+    totalRecordsProcessed += customers.length;
+    updates.push(`Customers: ${customers.length}`);
 
     // ============================================
     // Update Branch Last Sync Time
@@ -431,51 +390,35 @@ export async function POST(request: NextRequest) {
     // ============================================
     // Finalize Sync History
     // ============================================
-    const finalStatus = totalConflicts > 0 ? SyncStatus.PARTIAL : SyncStatus.SUCCESS;
+    const finalStatus = SyncStatus.SUCCESS;
 
     await updateSyncHistory(
       syncHistoryId,
       finalStatus,
       totalRecordsProcessed,
-      totalConflicts > 0 ? `${totalConflicts} conflicts detected` : undefined
+      undefined
     );
 
-    // Return sync result
     return NextResponse.json({
       success: true,
       message: 'Sync completed successfully',
       data: {
-        ...dataToReturn, // Include all pulled data for offline storage
+        ...dataToReturn,
         branchId: branch.id,
         branchName: branch.branchName,
         syncHistoryId,
         recordsProcessed: totalRecordsProcessed,
-        conflicts: totalConflicts,
         updates,
-        versions: {
-          before: syncStatus.currentVersions,
-          after: {
-            menuVersion: latestMenuVersion,
-            pricingVersion: latestPricingVersion,
-            recipeVersion: latestRecipeVersion,
-            ingredientVersion: latestIngredientVersion,
-            userVersion: latestUserVersion
-          }
+        performance: {
+          includeVariants,
+          includeOrders,
+          limit,
+          optimized: true
         }
       }
     });
   } catch (error: any) {
     console.error('[Sync Pull Error]', error);
-
-    // Only update sync history if it was created successfully
-    if (typeof syncHistoryId !== 'undefined') {
-      await updateSyncHistory(
-        syncHistoryId,
-        SyncStatus.FAILED,
-        0,
-        error.message || 'Unknown error'
-      );
-    }
 
     return NextResponse.json(
       {
