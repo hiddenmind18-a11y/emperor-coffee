@@ -44,8 +44,7 @@ export async function GET(request: NextRequest) {
           taxRate: true,
           hasVariants: true,
           sortOrder: true,
-          // REMOVED: imagePath - base64 images cause massive data transfer (4.22 GB!)
-          // POS doesn't need images embedded in JSON - they should be loaded as separate URLs
+          imagePath: true,
           // Include variants with essential data (variant type, option, price modifier)
           variants: {
             select: {
@@ -83,7 +82,7 @@ export async function GET(request: NextRequest) {
               id: true,
               name: true,
               sortOrder: true,
-              // REMOVED: imagePath - base64 images cause massive data transfer
+              imagePath: true,
             },
           },
         },

@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
         { sortOrder: 'asc' },
         { name: 'asc' },
       ],
-      // REMOVED: imagePath - base64 images cause massive data transfer
       select: {
         id: true,
         name: true,
@@ -22,6 +21,7 @@ export async function GET(request: NextRequest) {
         sortOrder: true,
         isActive: true,
         defaultVariantTypeId: true,
+        imagePath: true,
         _count: {
           select: { menuItems: true },
         },
