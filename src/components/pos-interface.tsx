@@ -2336,8 +2336,8 @@ export default function POSInterface() {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
-      {/* HORIZONTAL CATEGORY TABS (80px) - 2X BIGGER */}
-      <div className="flex-shrink-0 h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {/* HORIZONTAL CATEGORY TABS (60px) - Big but not too big */}
+      <div className="flex-shrink-0 h-[60px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
         <div className="flex items-center h-full gap-2 px-3">
           {allCategories.map((category) => {
             const isActive = selectedCategory === category.id;
@@ -2353,7 +2353,7 @@ export default function POSInterface() {
                   setSelectedCategory(category.id);
                   setSearchQuery('');
                 }}
-                className={`flex-shrink-0 flex items-center gap-2 px-4 h-[72px] rounded-xl text-[14px] font-bold transition-all duration-200 border active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-2 px-4 h-[52px] rounded-xl text-[13px] font-bold transition-all duration-200 border active:scale-95 ${
                   isActive
                     ? `bg-gradient-to-r shadow-md ${categoryColor} text-white border-transparent`
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -2377,8 +2377,8 @@ export default function POSInterface() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Product Grid */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Order Type & Actions Bar (28px) - COMPACTED */}
-          <div className="flex-shrink-0 h-7 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+          {/* Order Type & Actions Bar (32px) */}
+          <div className="flex-shrink-0 h-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
             {/* Order Type Selector */}
             <div className="flex items-center gap-1">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
@@ -2410,17 +2410,15 @@ export default function POSInterface() {
             {/* Spacer */}
             <div className="flex-1" />
 
-            {/* Daily Expenses Button - MORE PROMINENT */}
-            {currentShift && (
-              <Button
-                onClick={() => setShowDailyExpenseDialog(true)}
-                variant="outline"
-                className="h-6 px-2.5 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[11px] font-bold rounded-md gap-1.5 shadow-sm"
-              >
-                <Wallet className="h-3 w-3" />
-                <span className="font-black">Exp: {formatCurrency(currentDailyExpenses, currency)}</span>
-              </Button>
-            )}
+            {/* Daily Expenses Button - ALWAYS VISIBLE */}
+            <Button
+              onClick={() => setShowDailyExpenseDialog(true)}
+              variant="outline"
+              className="h-7 px-2.5 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[11px] font-bold rounded-md gap-1.5 shadow-sm"
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              <span className="font-black">Expenses</span>
+            </Button>
 
             {/* Table Info (Dine In Only) */}
             {orderType === 'dine-in' && selectedTable && (
@@ -2495,14 +2493,14 @@ export default function POSInterface() {
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">No products found</p>
               </div>
             ) : (
-              <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+              <div className="grid grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {filteredMenuItems.map((item) => {
                   const categoryColor = getCategoryColor(item.category);
                   return (
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className="group relative aspect-square bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-200 border border-slate-200 dark:border-slate-700 active:scale-95"
+                      className="group relative aspect-[4/5] bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-200 border border-slate-200 dark:border-slate-700 active:scale-95"
                     >
                       {/* Category Color Bar (Top 4px) */}
                       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${categoryColor}`} />
@@ -2511,14 +2509,14 @@ export default function POSInterface() {
                       <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-5 group-hover:opacity-10 transition-opacity duration-200`} />
 
                       {/* Content */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-2">
-                        {/* Product Name - Bigger font, less margin */}
-                        <h3 className="text-[16px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-2 px-1">
+                      <div className="absolute inset-0 flex flex-col items-center justify-between p-3 pb-4">
+                        {/* Product Name - Bigger, more space */}
+                        <h3 className="text-[18px] font-bold text-slate-900 dark:text-white text-center leading-snug line-clamp-3 mb-2 px-1 w-full">
                           {item.name}
                         </h3>
 
-                        {/* Price - Balanced size with name */}
-                        <div className={`text-[18px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
+                        {/* Price - Good size */}
+                        <div className={`text-[20px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
                           {item.price.toFixed(2)}
                         </div>
                       </div>
@@ -2549,17 +2547,15 @@ export default function POSInterface() {
               </Badge>
             </div>
             <div className="flex items-center gap-1">
-              {/* Daily Expenses Button in Cart Header - VERY PROMINENT */}
-              {currentShift && (
-                <Button
-                  onClick={() => setShowDailyExpenseDialog(true)}
-                  variant="outline"
-                  className="h-7 px-2 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-md gap-1 shadow-sm"
-                >
-                  <Wallet className="h-3 w-3" />
-                  <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
-                </Button>
-              )}
+              {/* Daily Expenses Button in Cart Header - ALWAYS VISIBLE */}
+              <Button
+                onClick={() => setShowDailyExpenseDialog(true)}
+                variant="outline"
+                className="h-7 px-2 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-md gap-1 shadow-sm"
+              >
+                <Wallet className="h-3 w-3" />
+                <span className="font-black">Expenses</span>
+              </Button>
               {/* Alerts Button - Behind Held Orders */}
               {lowStockAlerts.length > 0 && (
                 <div className="relative">
