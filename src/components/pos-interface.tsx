@@ -2335,7 +2335,7 @@ export default function POSInterface() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
+    <div className="flex flex-col h-full bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* HORIZONTAL CATEGORY TABS (80px) - 2X BIGGER */}
       <div className="flex-shrink-0 h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
         <div className="flex items-center h-full gap-2 px-3">
@@ -2410,15 +2410,15 @@ export default function POSInterface() {
             {/* Spacer */}
             <div className="flex-1" />
 
-            {/* Daily Expenses Button - PROMINENT */}
+            {/* Daily Expenses Button - MORE PROMINENT */}
             {currentShift && (
               <Button
                 onClick={() => setShowDailyExpenseDialog(true)}
                 variant="outline"
-                className="h-6 px-2 border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-md gap-1"
+                className="h-6 px-2.5 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[11px] font-bold rounded-md gap-1.5 shadow-sm"
               >
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+                <Wallet className="h-3 w-3" />
+                <span className="font-black">Exp: {formatCurrency(currentDailyExpenses, currency)}</span>
               </Button>
             )}
 
@@ -2511,14 +2511,14 @@ export default function POSInterface() {
                       <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-5 group-hover:opacity-10 transition-opacity duration-200`} />
 
                       {/* Content */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-3 pt-5">
-                        {/* Product Name */}
-                        <h3 className="text-[14px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-3">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-2">
+                        {/* Product Name - Bigger font, less margin */}
+                        <h3 className="text-[16px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-2 px-1">
                           {item.name}
                         </h3>
 
-                        {/* Price - NO EGP, just the number */}
-                        <div className={`text-[24px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
+                        {/* Price - Balanced size with name */}
+                        <div className={`text-[18px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
                           {item.price.toFixed(2)}
                         </div>
                       </div>
@@ -2549,6 +2549,17 @@ export default function POSInterface() {
               </Badge>
             </div>
             <div className="flex items-center gap-1">
+              {/* Daily Expenses Button in Cart Header - VERY PROMINENT */}
+              {currentShift && (
+                <Button
+                  onClick={() => setShowDailyExpenseDialog(true)}
+                  variant="outline"
+                  className="h-7 px-2 border-amber-500 dark:border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-md gap-1 shadow-sm"
+                >
+                  <Wallet className="h-3 w-3" />
+                  <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+                </Button>
+              )}
               {/* Alerts Button - Behind Held Orders */}
               {lowStockAlerts.length > 0 && (
                 <div className="relative">

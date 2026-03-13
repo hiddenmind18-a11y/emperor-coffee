@@ -537,7 +537,7 @@ export default function POSDashboard() {
       {/* Main Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Glassmorphism Header - Mobile Responsive */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/80/80 backdrop-filter blur(20px)  shadow-2xl">
+        <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/85 backdrop-filter shadow-md">
         <div className="px-2 sm:px-4 py-1.5 sm:py-2">
           <div className="flex items-center justify-between gap-2">
             {/* Mobile Menu Button & Logo */}
@@ -600,6 +600,28 @@ export default function POSDashboard() {
                 <Coffee className="h-5 w-5 sm:h-8 sm:w-8" />
                 <span className="text-lg sm:text-2xl font-bold tracking-tight hidden sm:inline">Emperor</span>
                 <span className="text-lg sm:text-2xl font-bold tracking-tight sm:hidden">Em</span>
+              </div>
+
+              {/* Navigation Dropdown - Desktop Only */}
+              <div className="hidden lg:block">
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger className="h-9 bg-white/60 backdrop-blur-md border-slate-200 rounded-lg shadow text-xs font-bold text-emerald-700 min-w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {navigationItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <SelectItem key={item.id} value={item.id}>
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             {/* User Info & Actions - Responsive */}
@@ -719,9 +741,9 @@ export default function POSDashboard() {
       </header>
 
       {/* Main Content - Full Height, No Footer */}
-      <main className="flex-1 px-2 sm:px-4 py-2">
+      <main className="flex-1 px-2 sm:px-4 py-2 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-hidden">
             <TabsContent value="pos" className="h-full m-0 p-0">
               {canAccessPOS ? (
                 <POSInterface />
