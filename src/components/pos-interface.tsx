@@ -2410,49 +2410,57 @@ export default function POSInterface() {
         </div>
       </div>
 
-      {/* HORIZONTAL CATEGORY TABS (44px) */}
-      <div className="flex-shrink-0 h-[44px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
-        <div className="flex items-center h-full gap-1 px-2">
-          {allCategories.map((category) => {
-            const isActive = selectedCategory === category.id;
-            const categoryColor = getCategoryColor(category.name);
-            const itemCount = category.id === 'all'
-              ? menuItems.length
-              : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
+      {/* CATEGORY DROPDOWN (32px) */}
+      <div className="flex-shrink-0 h-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+        <div className="flex-1">
+          <Select value={selectedCategory} onValueChange={(val) => { setSelectedCategory(val); setSearchQuery(''); }}>
+            <SelectTrigger className="h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {allCategories.map((category) => {
+                const isActive = selectedCategory === category.id;
+                const categoryColor = getCategoryColor(category.name);
+                const itemCount = category.id === 'all'
+                  ? menuItems.length
+                  : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
 
-            return (
-              <button
-                key={category.id}
-                onClick={() => {
-                  setSelectedCategory(category.id);
-                  setSearchQuery('');
-                }}
-                className={`flex-shrink-0 flex items-center gap-2 px-3 h-[40px] rounded-lg text-[11px] font-bold transition-all duration-200 border active:scale-95 ${
-                  isActive
-                    ? `bg-gradient-to-r shadow-sm ${categoryColor} text-white border-transparent`
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-              >
-                <span className="whitespace-nowrap">{category.name}</span>
-                {category.id !== 'all' && (
-                  <span className={`px-1 py-0.5 rounded-full text-[8px] font-semibold ${
-                    isActive ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-700'
-                  }`}>
-                    {itemCount}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                return (
+                  <SelectItem key={category.id} value={category.id} className="text-xs">
+                    <div className="flex items-center gap-2 w-full">
+                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${categoryColor}`} />
+                      <span>{category.name}</span>
+                      {category.id !== 'all' && (
+                        <span className="ml-auto text-[10px] text-slate-500">({itemCount})</span>
+                      )}
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Daily Expenses Button (IN HEADER - Always Visible) */}
+        {currentShift && (
+          <Button
+            onClick={() => setShowDailyExpenseDialog(true)}
+            variant="outline"
+            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="hidden sm:inline">Expenses</span>
+            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+          </Button>
+        )}
       </div>
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Product Grid */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Order Type & Actions Bar (40px) */}
-          <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+          {/* Order Type & Actions Bar (36px) */}
+          <div className="flex-shrink-0 h-9 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
             {/* Order Type Selector */}
             <div className="flex items-center gap-1">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
@@ -2468,7 +2476,7 @@ export default function POSInterface() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex items-center gap-1.5 px-2.5 h-[36px] rounded-lg text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
+                    className={`flex items-center gap-1 px-2 h-[32px] rounded-md text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
                       isActive
                         ? `bg-gradient-to-r ${config.gradient} text-white border-transparent shadow-sm`
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -2486,7 +2494,7 @@ export default function POSInterface() {
 
             {/* Table Info (Dine In Only) */}
             {orderType === 'dine-in' && selectedTable && (
-              <div className="flex items-center gap-2 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+              <div className="flex items-center gap-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-md">
                 <div className="w-5 h-5 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-[10px]">
                   {selectedTable.tableNumber}
                 </div>
@@ -2509,10 +2517,10 @@ export default function POSInterface() {
               <Button
                 onClick={handleCloseTable}
                 size="sm"
-                className="h-8 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                className="h-7 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
               >
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Close Table
+                Close
               </Button>
             )}
 
@@ -2521,10 +2529,10 @@ export default function POSInterface() {
               <Button
                 onClick={() => setShowTableGrid(true)}
                 size="sm"
-                className="h-8 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                className="h-7 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
               >
                 <Utensils className="h-3 w-3 mr-1" />
-                Select Table
+                Table
               </Button>
             )}
           </div>
@@ -2606,10 +2614,10 @@ export default function POSInterface() {
           </div>
         </div>
 
-        {/* Right: Compact Cart Sidebar (300px) */}
-        <div className="hidden xl:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl">
-          {/* Cart Header (50px) */}
-          <div className="flex-shrink-0 h-[50px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
+        {/* Right: Compact Cart Sidebar (300px) - SHOW ON LG (1024px+) */}
+        <div className="hidden lg:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl">
+          {/* Cart Header (44px) */}
+          <div className="flex-shrink-0 h-[44px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-bold text-slate-900 dark:text-white">
@@ -2796,83 +2804,62 @@ export default function POSInterface() {
             </div>
           )}
 
-          {/* Daily Expenses (32px) */}
-          {currentShift && (
-            <div className="flex-shrink-0 h-8 px-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="h-3 w-3 text-amber-600 dark:text-amber-400" />
-                <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 uppercase">Expenses</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold text-amber-900 dark:text-amber-100">
-                  {formatCurrency(currentDailyExpenses, currency)}
-                </span>
-                <Button
-                  onClick={() => setShowDailyExpenseDialog(true)}
-                  size="icon"
-                  variant="ghost"
-                  className="h-5 w-5 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                >
-                  <Plus className="h-2.5 w-2.5" />
-                </Button>
-              </div>
-            </div>
-          )}
+          {/* Daily Expenses - REMOVED (Now in header) */}
 
-          {/* Order Summary (COMPACT - 110px, STICKY) */}
-          <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky bottom-0 z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
-            <div className="space-y-1 mb-3">
-              <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
+          {/* Order Summary (COMPACT - 100px, STICKY) */}
+          <div className="flex-shrink-0 p-2.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky bottom-0 z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+            <div className="space-y-0.5 mb-2">
+              <div className="flex justify-between text-[9px] text-slate-600 dark:text-slate-400">
                 <span>Subtotal</span>
                 <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(subtotal, currency)}</span>
               </div>
               {deliveryFee > 0 && (
-                <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
+                <div className="flex justify-between text-[9px] text-slate-600 dark:text-slate-400">
                   <span>Delivery</span>
                   <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(deliveryFee, currency)}</span>
                 </div>
               )}
               {(promoDiscount > 0 || loyaltyDiscount > 0) && (
-                <div className="flex justify-between text-[10px] text-orange-600 dark:text-orange-400">
+                <div className="flex justify-between text-[9px] text-orange-600 dark:text-orange-400">
                   <span>Discount</span>
                   <span className="font-bold">-{formatCurrency(promoDiscount + loyaltyDiscount, currency)}</span>
                 </div>
               )}
-              <div className="flex justify-between items-center pt-1 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[12px] font-bold text-slate-900 dark:text-white">Total</span>
-                <span className="text-[20px] font-black text-emerald-600 dark:text-emerald-400">
+              <div className="flex justify-between items-center pt-0.5 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[11px] font-bold text-slate-900 dark:text-white">Total</span>
+                <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(total, currency)}
                 </span>
               </div>
             </div>
 
             {/* Checkout Buttons */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Button
                 onClick={() => handleCheckout('cash')}
                 disabled={processing || currentCart.length === 0}
-                className="w-full h-9 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20 font-bold text-[12px] rounded-lg"
+                className="w-full h-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20 font-bold text-[11px] rounded-md"
               >
-                <DollarSign className="h-4 w-4 mr-1.5" />
+                <DollarSign className="h-3.5 w-3.5 mr-1" />
                 CASH
               </Button>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1">
                 <Button
                   onClick={handleCardPaymentClick}
                   disabled={processing || currentCart.length === 0}
                   variant="outline"
-                  className="flex-1 h-8 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[11px] rounded-lg"
+                  className="flex-1 h-7 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[10px] rounded-md"
                 >
-                  <CreditCard className="h-3 w-3 mr-1" />
+                  <CreditCard className="h-2.5 w-2.5 mr-1" />
                   CARD
                 </Button>
                 <Button
                   onClick={handleHoldOrder}
                   disabled={processing || currentCart.length === 0}
                   variant="outline"
-                  className="flex-1 h-8 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[10px] rounded-lg"
+                  className="flex-1 h-7 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[9px] rounded-md"
                 >
-                  <Pause className="h-3 w-3 mr-1" />
+                  <Pause className="h-2.5 w-2.5 mr-0.5" />
                   Hold
                 </Button>
               </div>
@@ -2881,7 +2868,7 @@ export default function POSInterface() {
         </div>
       </div>
 
-      {/* Mobile Cart Bottom Bar - Always visible */}
+      {/* Mobile Cart Bottom Bar - Show on mobile (hidden on lg+) */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-2xl pb-safe">
         <div className="px-4 py-3 flex items-center gap-3 max-w-4xl mx-auto">
           <button
