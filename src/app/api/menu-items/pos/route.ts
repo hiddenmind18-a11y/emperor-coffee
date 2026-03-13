@@ -62,9 +62,10 @@ export async function GET(request: NextRequest) {
       });
     }, 600000); // 10 minute cache for POS
 
-    return NextResponse.json(
-      { success: true, menuItems },
-      {
+    return NextResponse.json({
+      success: true,
+      menuItems
+    }, {
         headers: {
           'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300',
           'Content-Type': 'application/json',
