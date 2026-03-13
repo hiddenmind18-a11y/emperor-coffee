@@ -387,6 +387,13 @@ export default function POSInterface() {
   // Settings dialog state
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
 
+  // Low Stock Alerts dialog state
+  const [showLowStockDialog, setShowLowStockDialog] = useState(false);
+
+  // Collapsible sections state
+  const [customerSearchCollapsed, setCustomerSearchCollapsed] = useState(true);
+  const [deliveryCollapsed, setDeliveryCollapsed] = useState(false);
+
   const { currency, t } = useI18n();
   const { data: categoriesData, loading: categoriesLoading } = useOfflineData(
     '/api/categories?active=true',
@@ -2329,92 +2336,88 @@ export default function POSInterface() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
-      {/* PROFESSIONAL POS HEADER (40px) */}
-      <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+      {/* COMPACT HEADER (36px) */}
+      <div className="flex-shrink-0 h-9 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-3">
         {/* Logo/Brand */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
-            <Store className="h-4 w-4 text-white" />
+          <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
+            <Store className="h-3.5 w-3.5 text-white" />
           </div>
           <div className="hidden sm:block">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Emperor</h1>
-            <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase -mt-0.5">POS</p>
+            <h1 className="font-bold text-sm text-slate-900 dark:text-white leading-none">Emperor POS</h1>
           </div>
         </div>
 
-        {/* Separator */}
-        <Separator orientation="vertical" className="h-6 hidden sm:block" />
-
-        {/* Search Bar - Full Width */}
-        <div className="flex-1 max-w-2xl relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+        {/* Search Bar */}
+        <div className="flex-1 max-w-xl relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
           <Input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-8 h-8 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
+            className="pl-8 pr-7 h-7 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
           />
           {searchQuery && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSearchQuery('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400 hover:text-slate-600"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 hover:text-slate-600"
             >
-              <X className="h-3 w-3" />
+              <X className="h-2.5 w-2.5" />
             </Button>
           )}
         </div>
 
         {/* Branch Selector (Admin Only) */}
         {user?.role === 'ADMIN' && (
-          <>
-            <Separator orientation="vertical" className="h-6 hidden sm:block" />
-            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-              <SelectTrigger className="w-32 h-8 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
-                <SelectValue placeholder="Branch" />
-              </SelectTrigger>
-              <SelectContent>
-                {branches.map((branch) => (
-                  <SelectItem key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </>
+          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+            <SelectTrigger className="w-28 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
+              <SelectValue placeholder="Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              {branches.map((branch) => (
+                <SelectItem key={branch.id} value={branch.id}>
+                  {branch.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
 
         {/* User & Settings */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           {lowStockAlerts.length > 0 && (
             <div className="relative group">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition-all">
+              <div
+                onClick={() => setShowLowStockDialog(true)}
+                className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:scale-105 transition-all"
+              >
                 <AlertTriangle className="h-3.5 w-3.5 text-white" />
               </div>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {lowStockAlerts.length}
               </span>
             </div>
           )}
           <div
             onClick={() => setShowSettingsDialog(true)}
-            className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
+            className="w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
           >
             <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
           </div>
         </div>
       </div>
 
-      {/* HORIZONTAL CATEGORY TABS (50px) */}
-      <div className="flex-shrink-0 h-[50px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {/* HORIZONTAL CATEGORY TABS (44px) */}
+      <div className="flex-shrink-0 h-[44px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
         <div className="flex items-center h-full gap-1 px-2">
           {allCategories.map((category) => {
             const isActive = selectedCategory === category.id;
             const categoryColor = getCategoryColor(category.name);
-            const itemCount = category.id === 'all' 
-              ? menuItems.length 
+            const itemCount = category.id === 'all'
+              ? menuItems.length
               : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
 
             return (
@@ -2424,7 +2427,7 @@ export default function POSInterface() {
                   setSelectedCategory(category.id);
                   setSearchQuery('');
                 }}
-                className={`flex-shrink-0 flex items-center gap-2 px-4 h-[48px] rounded-lg text-xs font-bold transition-all duration-200 border active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-2 px-3 h-[40px] rounded-lg text-[11px] font-bold transition-all duration-200 border active:scale-95 ${
                   isActive
                     ? `bg-gradient-to-r shadow-sm ${categoryColor} text-white border-transparent`
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -2432,7 +2435,7 @@ export default function POSInterface() {
               >
                 <span className="whitespace-nowrap">{category.name}</span>
                 {category.id !== 'all' && (
-                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${
+                  <span className={`px-1 py-0.5 rounded-full text-[8px] font-semibold ${
                     isActive ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-700'
                   }`}>
                     {itemCount}
@@ -2448,15 +2451,15 @@ export default function POSInterface() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Product Grid */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Order Type & Actions Bar (44px) */}
-          <div className="flex-shrink-0 h-11 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+          {/* Order Type & Actions Bar (40px) */}
+          <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
             {/* Order Type Selector */}
             <div className="flex items-center gap-1">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
                 const configs = {
-                  'dine-in': { icon: <Utensils className="h-3.5 w-3.5" />, label: 'Dine In', gradient: 'from-purple-500 to-violet-600' },
-                  'take-away': { icon: <Package className="h-3.5 w-3.5" />, label: 'Take Away', gradient: 'from-amber-500 to-orange-600' },
-                  'delivery': { icon: <Truck className="h-3.5 w-3.5" />, label: 'Delivery', gradient: 'from-blue-500 to-cyan-600' },
+                  'dine-in': { icon: <Utensils className="h-3 w-3" />, label: 'Dine In', gradient: 'from-purple-500 to-violet-600' },
+                  'take-away': { icon: <Package className="h-3 w-3" />, label: 'Take Away', gradient: 'from-amber-500 to-orange-600' },
+                  'delivery': { icon: <Truck className="h-3 w-3" />, label: 'Delivery', gradient: 'from-blue-500 to-cyan-600' },
                 };
                 const config = configs[type];
                 const isActive = orderType === type;
@@ -2465,7 +2468,7 @@ export default function POSInterface() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex items-center gap-1.5 px-3 h-[40px] rounded-lg text-[11px] font-bold transition-all duration-200 border active:scale-95 ${
+                    className={`flex items-center gap-1.5 px-2.5 h-[36px] rounded-lg text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
                       isActive
                         ? `bg-gradient-to-r ${config.gradient} text-white border-transparent shadow-sm`
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -2483,20 +2486,20 @@ export default function POSInterface() {
 
             {/* Table Info (Dine In Only) */}
             {orderType === 'dine-in' && selectedTable && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                <div className="w-6 h-6 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-xs">
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                <div className="w-5 h-5 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-[10px]">
                   {selectedTable.tableNumber}
                 </div>
-                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
                   Table {selectedTable.tableNumber}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleDeselectTable}
-                  className="h-6 w-6 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                  className="h-5 w-5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-2.5 w-2.5" />
                 </Button>
               </div>
             )}
@@ -2506,9 +2509,9 @@ export default function POSInterface() {
               <Button
                 onClick={handleCloseTable}
                 size="sm"
-                className="h-9 px-3 text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                className="h-8 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
               >
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle className="h-3 w-3 mr-1" />
                 Close Table
               </Button>
             )}
@@ -2518,9 +2521,9 @@ export default function POSInterface() {
               <Button
                 onClick={() => setShowTableGrid(true)}
                 size="sm"
-                className="h-9 px-3 text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                className="h-8 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
               >
-                <Utensils className="h-3.5 w-3.5 mr-1" />
+                <Utensils className="h-3 w-3 mr-1" />
                 Select Table
               </Button>
             )}
@@ -2603,119 +2606,114 @@ export default function POSInterface() {
           </div>
         </div>
 
-        {/* Right: Cart Sidebar (320px) */}
-        <div className="hidden xl:flex flex-col w-[320px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
-          {/* Cart Header (60px) */}
-          <div className="flex-shrink-0 h-[60px] px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-850/50">
+        {/* Right: Compact Cart Sidebar (300px) */}
+        <div className="hidden xl:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl">
+          {/* Cart Header (50px) */}
+          <div className="flex-shrink-0 h-[50px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/30">
-                <ShoppingCart className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Order</h2>
-                {orderType === 'dine-in' && selectedTable && (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Table {selectedTable.tableNumber}</p>
-                )}
-              </div>
+              <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-sm font-bold text-slate-900 dark:text-white">
+                {orderType === 'dine-in' && selectedTable ? `Table ${selectedTable.tableNumber}` : 'Order'}
+              </span>
+              <Badge variant="secondary" className="h-5 text-[10px] px-1.5">
+                {totalItems}
+              </Badge>
             </div>
             <div className="flex items-center gap-1">
-              {/* Held Orders Button */}
               <Button
                 onClick={() => setShowHeldOrdersDialog(true)}
-                size="sm"
-                variant="outline"
-                className="h-8 px-2 text-[10px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 text-slate-500 hover:text-slate-700"
               >
-                <Clock className="h-3 w-3 mr-1" />
-                Held {heldOrders.length > 0 && `(${heldOrders.length})`}
+                <Clock className="h-3.5 w-3.5" />
               </Button>
-              {/* Transfer Button (Dine In) */}
               {orderType === 'dine-in' && selectedTable && tableCart.length > 0 && (
                 <Button
                   onClick={handleOpenTransferDialog}
-                  size="sm"
-                  variant="outline"
-                  className="h-8 px-2 text-[10px] border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg"
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-blue-500 hover:text-blue-700"
                 >
-                  <ArrowRight className="h-3 w-3" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>
           </div>
 
-          {/* Cart Items (Scrollable) */}
+          {/* Cart Items (Scrollable - Takes All Available Space) */}
           <div className="flex-1 min-h-0 overflow-y-auto">
-            <div className="p-3 space-y-2">
+            <div className="p-2 space-y-1.5">
               {currentCart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-                  <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-3">
-                    <ShoppingCart className="h-7 w-7 opacity-40" />
-                  </div>
-                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Cart is empty</p>
+                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <ShoppingCart className="h-8 w-8 opacity-30 mb-2" />
+                  <p className="text-xs font-medium">Add items to start</p>
                 </div>
               ) : (
                 currentCart.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white dark:bg-slate-900 rounded-xl p-2 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors"
+                    className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-1.5">
                       <div className="flex-1 min-w-0 pr-2">
-                        <h4 className="text-[13px] font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                        <h4 className="text-[12px] font-bold text-slate-900 dark:text-white line-clamp-1">
                           {item.name}
                         </h4>
                         {item.variantName && (
-                          <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
+                          <div className="text-[10px] text-emerald-600 dark:text-emerald-400">
                             {item.variantName}
                           </div>
                         )}
                         {item.note && (
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 italic">
+                          <div className="text-[9px] text-slate-500 italic truncate">
                             "{item.note}"
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
                         <Button
-                          variant="ghost"
                           size="icon"
+                          variant="ghost"
                           onClick={() => openNoteDialog(item)}
-                          className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg"
+                          className="h-6 w-6 p-0 text-slate-400 hover:text-blue-600"
                         >
-                          <Edit3 className="h-3 w-3" />
+                          <Edit3 className="h-2.5 w-2.5" />
                         </Button>
                         <Button
-                          variant="ghost"
                           size="icon"
+                          variant="ghost"
                           onClick={() => removeFromCart(item.id)}
-                          className="h-7 w-7 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg"
+                          className="h-6 w-6 p-0 text-slate-400 hover:text-red-600"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-2.5 w-2.5" />
                         </Button>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5">
                         <Button
+                          size="icon"
                           variant="outline"
                           onClick={() => handleDecrementQuantity(item.id)}
-                          className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 p-0"
+                          className="h-6 w-6 p-0 rounded hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-2.5 w-2.5" />
                         </Button>
-                        <span className="w-8 text-center text-[13px] font-bold text-slate-900 dark:text-white">
+                        <span className="w-6 text-center text-[12px] font-bold text-slate-900 dark:text-white">
                           {item.quantity}
                         </span>
                         <Button
+                          size="icon"
                           variant="outline"
                           onClick={() => handleIncrementQuantity(item.id)}
-                          className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 p-0"
+                          className="h-6 w-6 p-0 rounded hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-2.5 w-2.5" />
                         </Button>
                       </div>
-                      <div className="text-[13px] font-bold text-slate-900 dark:text-white">
+                      <div className="text-[12px] font-bold text-slate-900 dark:text-white">
                         {formatCurrency(item.price * item.quantity, currency)}
                       </div>
                     </div>
@@ -2725,157 +2723,159 @@ export default function POSInterface() {
             </div>
           </div>
 
-          {/* Customer Search Section */}
-          <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
-            <CustomerSearch
-              onAddressSelect={setSelectedAddress}
-              selectedAddress={selectedAddress}
-              deliveryAreas={deliveryAreas}
-              branchId={user?.role === 'ADMIN' ? selectedBranch : user?.branchId}
-            />
+          {/* Customer Search (Collapsible - 32px when collapsed) */}
+          <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => setCustomerSearchCollapsed(!customerSearchCollapsed)}
+              className="w-full h-8 px-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Customer</span>
+                {selectedAddress && (
+                  <Badge className="h-4 text-[8px] px-1 bg-emerald-500 hover:bg-emerald-600">Linked</Badge>
+                )}
+              </div>
+              <ChevronRight className={`h-3.5 w-3.5 text-slate-400 transition-transform ${!customerSearchCollapsed ? 'rotate-90' : ''}`} />
+            </button>
+            {!customerSearchCollapsed && (
+              <div className="p-2 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                <CustomerSearch
+                  onAddressSelect={setSelectedAddress}
+                  selectedAddress={selectedAddress}
+                  deliveryAreas={deliveryAreas}
+                  branchId={user?.role === 'ADMIN' ? selectedBranch : user?.branchId}
+                />
+              </div>
+            )}
           </div>
 
-          {/* Delivery Section (Only for Delivery) */}
+          {/* Delivery Section (Collapsible - Only for delivery orders) */}
           {orderType === 'delivery' && (
-            <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
-              <div className="space-y-2">
-                <div>
-                  <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Address</Label>
-                  <Textarea
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    placeholder="Enter full delivery address..."
-                    rows={2}
-                    className="text-xs mt-1 resize-none rounded-lg"
-                  />
+            <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => setDeliveryCollapsed(!deliveryCollapsed)}
+                className="w-full h-8 px-3 flex items-center justify-between bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Truck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase">Delivery</span>
+                  {deliveryFee > 0 && (
+                    <span className="text-[9px] font-medium text-amber-600">+{formatCurrency(deliveryFee, currency)}</span>
+                  )}
                 </div>
-                <div>
-                  <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Area</Label>
-                  <Select value={deliveryArea} onValueChange={setDeliveryArea}>
-                    <SelectTrigger className="text-xs h-8 mt-1 rounded-lg">
-                      <SelectValue placeholder="Select area" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {deliveryAreas.map((area) => (
-                        <SelectItem key={area.id} value={area.id}>
-                          {area.name} ({formatCurrency(area.fee, currency)})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {couriers.length > 0 && (
+                <ChevronRight className={`h-3.5 w-3.5 text-amber-500 transition-transform ${!deliveryCollapsed ? 'rotate-90' : ''}`} />
+              </button>
+              {!deliveryCollapsed && (
+                <div className="p-2 bg-white dark:bg-slate-900 border-t border-amber-100 dark:border-amber-900/30 space-y-2">
                   <div>
-                    <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Assign Courier</Label>
-                    <Select value={selectedCourierId} onValueChange={setSelectedCourierId}>
-                      <SelectTrigger className="text-xs h-8 mt-1 rounded-lg">
-                        <SelectValue placeholder="Select courier (optional)" />
+                    <Textarea
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      placeholder="Delivery address..."
+                      rows={2}
+                      className="text-[10px] resize-none rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <Select value={deliveryArea} onValueChange={setDeliveryArea}>
+                      <SelectTrigger className="text-[10px] h-7 rounded-lg">
+                        <SelectValue placeholder="Area" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">No courier assigned</SelectItem>
-                        {couriers.map((courier: any) => (
-                          <SelectItem key={courier.id} value={courier.id}>
-                            {courier.name}
+                        {deliveryAreas.map((area) => (
+                          <SelectItem key={area.id} value={area.id} className="text-[10px]">
+                            {area.name} ({formatCurrency(area.fee, currency)})
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Daily Expenses (40px) */}
+          {/* Daily Expenses (32px) */}
           {currentShift && (
-            <div className="flex-shrink-0 h-10 px-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-                <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">Expenses</span>
+            <div className="flex-shrink-0 h-8 px-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+                <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 uppercase">Expenses</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-amber-900 dark:text-amber-100">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold text-amber-900 dark:text-amber-100">
                   {formatCurrency(currentDailyExpenses, currency)}
                 </span>
                 <Button
                   onClick={() => setShowDailyExpenseDialog(true)}
                   size="icon"
-                  variant="outline"
-                  className="h-6 w-6 p-0 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-lg"
+                  variant="ghost"
+                  className="h-5 w-5 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50"
                 >
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-2.5 w-2.5" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Order Summary (STICKY - Always Visible) */}
-          <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900 sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-            <div className="space-y-1.5 mb-4">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {formatCurrency(subtotal, currency)}
-                </span>
+          {/* Order Summary (COMPACT - 110px, STICKY) */}
+          <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky bottom-0 z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+            <div className="space-y-1 mb-3">
+              <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
+                <span>Subtotal</span>
+                <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(subtotal, currency)}</span>
               </div>
               {deliveryFee > 0 && (
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-600 dark:text-slate-400">Delivery</span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    {formatCurrency(deliveryFee, currency)}
-                  </span>
+                <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
+                  <span>Delivery</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(deliveryFee, currency)}</span>
                 </div>
               )}
               {(promoDiscount > 0 || loyaltyDiscount > 0) && (
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-orange-600 dark:text-orange-400">Discount</span>
-                  <span className="font-bold text-orange-600 dark:text-orange-400">
-                    -{formatCurrency(promoDiscount + loyaltyDiscount, currency)}
-                  </span>
+                <div className="flex justify-between text-[10px] text-orange-600 dark:text-orange-400">
+                  <span>Discount</span>
+                  <span className="font-bold">-{formatCurrency(promoDiscount + loyaltyDiscount, currency)}</span>
                 </div>
               )}
-              <Separator className="bg-slate-200 dark:bg-slate-700 my-2" />
-              <div className="flex justify-between items-center">
-                <span className="text-[13px] font-bold text-slate-900 dark:text-white">Total</span>
-                <span className="text-[24px] font-black text-emerald-600 dark:text-emerald-400">
+              <div className="flex justify-between items-center pt-1 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[12px] font-bold text-slate-900 dark:text-white">Total</span>
+                <span className="text-[20px] font-black text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(total, currency)}
                 </span>
               </div>
             </div>
 
-            {/* Checkout Buttons (100px) */}
-            <div className="space-y-2">
-              {/* CASH Button - BIG (48px) */}
+            {/* Checkout Buttons */}
+            <div className="space-y-1.5">
               <Button
                 onClick={() => handleCheckout('cash')}
                 disabled={processing || currentCart.length === 0}
-                className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30 font-bold text-[13px] rounded-xl transition-all active:scale-[0.98]"
+                className="w-full h-9 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20 font-bold text-[12px] rounded-lg"
               >
-                <DollarSign className="h-5 w-5 mr-2" />
+                <DollarSign className="h-4 w-4 mr-1.5" />
                 CASH
               </Button>
-
-              {/* CARD Button (40px) */}
-              <Button
-                onClick={handleCardPaymentClick}
-                disabled={processing || currentCart.length === 0}
-                variant="outline"
-                className="w-full h-10 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[13px] rounded-xl transition-all active:scale-[0.98]"
-              >
-                <CreditCard className="h-4 w-4 mr-2" />
-                CARD
-              </Button>
-
-              {/* Hold Order Button (32px) */}
-              <Button
-                onClick={handleHoldOrder}
-                disabled={processing || currentCart.length === 0}
-                variant="outline"
-                className="w-full h-8 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[11px] rounded-xl transition-all active:scale-[0.98]"
-              >
-                <Pause className="h-3.5 w-3.5 mr-1.5" />
-                Hold Order
-              </Button>
+              <div className="flex gap-1.5">
+                <Button
+                  onClick={handleCardPaymentClick}
+                  disabled={processing || currentCart.length === 0}
+                  variant="outline"
+                  className="flex-1 h-8 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[11px] rounded-lg"
+                >
+                  <CreditCard className="h-3 w-3 mr-1" />
+                  CARD
+                </Button>
+                <Button
+                  onClick={handleHoldOrder}
+                  disabled={processing || currentCart.length === 0}
+                  variant="outline"
+                  className="flex-1 h-8 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[10px] rounded-lg"
+                >
+                  <Pause className="h-3 w-3 mr-1" />
+                  Hold
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -4207,6 +4207,58 @@ export default function POSInterface() {
             >
               <ArrowRight className="h-4 w-4 mr-2" />
               Transfer Items
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Low Stock Alerts Dialog */}
+      <Dialog open={showLowStockDialog} onOpenChange={setShowLowStockDialog}>
+        <DialogContent className="sm:max-w-md rounded-3xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                <AlertTriangle className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold">Low Stock Alerts</DialogTitle>
+                <DialogDescription>
+                  {lowStockAlerts.length} item{lowStockAlerts.length !== 1 ? 's' : ''} running low
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <ScrollArea className="max-h-[400px] py-4">
+            <div className="space-y-2">
+              {lowStockAlerts.map((alert: any) => (
+                <div
+                  key={alert.id}
+                  className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800"
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="flex-1">
+                      <p className="font-bold text-sm text-amber-900 dark:text-amber-100">{alert.name}</p>
+                      <p className="text-xs text-amber-700 dark:text-amber-300">{alert.category || 'Uncategorized'}</p>
+                    </div>
+                    <Badge variant="destructive" className="h-5 text-[10px]">
+                      {alert.currentStock} left
+                    </Badge>
+                  </div>
+                  {alert.reorderLevel && (
+                    <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1">
+                      Reorder level: {alert.reorderLevel}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter className="pt-4 border-t">
+            <Button
+              onClick={() => setShowLowStockDialog(false)}
+              className="w-full rounded-xl h-11 font-semibold"
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
