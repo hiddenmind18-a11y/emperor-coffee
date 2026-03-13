@@ -5018,3 +5018,58 @@ Result:
 2. src/components/pos-interface.tsx (restored category tabs, Daily Expenses in header)
 
 **Status: ✅ COMPLETE**
+
+---
+Task ID: 10
+Agent: z-ai-web-dev-sdk
+Task: Move nav to header, remove separator, move controls behind categories, simplify product cards
+
+Work Log:
+- Navigation dropdown moved to header (behind Emperor logo)
+  * Saves ~36px of vertical space in POS area
+  * No duplicate dropdown in main content
+  * Compact 36px height in header
+  * User info, Online, Queue, Sync, English, Logout all in header
+
+- Removed header border line
+  * Removed border-b from header className
+  * Cleaner, more modern look
+  * Saves visual space
+
+- Moved Search/Alert/Settings/Expenses to toolbar behind categories
+  * New 32px toolbar with all controls
+  * Positioned after category tabs, before order type bar
+  * Compact search bar (flex-1 max-w-sm)
+  * Alerts button (when low stock)
+  * Settings button
+  - Daily Expenses button (when shift open)
+  - Branch selector (admin only)
+
+- Simplified product cards:
+  - Removed \"EGP\" currency symbol from prices
+  - Removed variants badge (\"1 variants\", \"2 variants\")
+  - Shows ONLY: Menu Item Name + Price (just the number, e.g., \"25.00\")
+  - Name: 14px font-bold (was 13px) - more readable at 100% zoom
+  - Price: 24px font-black (was 18px) - bigger, more prominent
+  - Clean, minimal, professional design
+
+Total space savings:
+- Removed POS header: -36px
+- Removed duplicate nav dropdown: -36px  
+- Simplified product cards: -4px per card (no variants badge)
+- Header padding reduced: -8px
+- Total: ~84px+ vertical space saved for products!
+
+Result:
+- Much more space for product grid
+- Cleaner, more professional look
+- Product cards easier to read at 100% zoom
+- All controls accessible but compact
+- Perfect for 1024x768 touch monitors
+- All functionality preserved
+
+**Files Modified:**
+1. src/app/page.tsx (nav in header, no border, removed duplicate dropdown, no footer)
+2. src/components/pos-interface.tsx (removed POS header, added toolbar, simplified product cards)
+
+**Status: ✅ COMPLETE**

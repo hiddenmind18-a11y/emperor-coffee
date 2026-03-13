@@ -2336,9 +2336,9 @@ export default function POSInterface() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
-      {/* HORIZONTAL CATEGORY TABS (40px) */}
-      <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
-        <div className="flex items-center h-full gap-1 px-2">
+      {/* HORIZONTAL CATEGORY TABS (80px) - 2X BIGGER */}
+      <div className="flex-shrink-0 h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div className="flex items-center h-full gap-2 px-3">
           {allCategories.map((category) => {
             const isActive = selectedCategory === category.id;
             const categoryColor = getCategoryColor(category.name);
@@ -2353,15 +2353,15 @@ export default function POSInterface() {
                   setSelectedCategory(category.id);
                   setSearchQuery('');
                 }}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 h-[36px] rounded-md text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-2 px-4 h-[72px] rounded-xl text-[14px] font-bold transition-all duration-200 border active:scale-95 ${
                   isActive
-                    ? `bg-gradient-to-r shadow-sm ${categoryColor} text-white border-transparent`
+                    ? `bg-gradient-to-r shadow-md ${categoryColor} text-white border-transparent`
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <span className="whitespace-nowrap">{category.name}</span>
                 {category.id !== 'all' && (
-                  <span className={`px-1 py-0.5 rounded-full text-[8px] font-semibold ${
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                     isActive ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-700'
                   }`}>
                     {itemCount}
@@ -2373,88 +2373,12 @@ export default function POSInterface() {
         </div>
       </div>
 
-      {/* TOOLBAR (32px) - Search, Alerts, Settings, Expenses, Branch */}
-      <div className="flex-shrink-0 h-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-2 gap-2">
-        {/* Search Bar */}
-        <div className="flex-1 max-w-sm relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
-          <Input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-7 pr-6 h-7 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 hover:text-slate-600"
-            >
-              <X className="h-2.5 w-2.5" />
-            </Button>
-          )}
-        </div>
-
-        {/* Branch Selector (Admin Only) */}
-        {user?.role === 'ADMIN' && (
-          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-20 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
-              <SelectValue placeholder="Branch" />
-            </SelectTrigger>
-            <SelectContent>
-              {branches.map((branch) => (
-                <SelectItem key={branch.id} value={branch.id}>
-                  {branch.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Daily Expenses */}
-        {currentShift && (
-          <Button
-            onClick={() => setShowDailyExpenseDialog(true)}
-            variant="outline"
-            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
-          >
-            <TrendingUp className="h-3 w-3" />
-            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
-          </Button>
-        )}
-
-        {/* Alerts */}
-        {lowStockAlerts.length > 0 && (
-          <div className="relative group">
-            <div
-              onClick={() => setShowLowStockDialog(true)}
-              className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:scale-105 transition-all"
-            >
-              <AlertTriangle className="h-3.5 w-3.5 text-white" />
-            </div>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              {lowStockAlerts.length}
-            </span>
-          </div>
-        )}
-
-        {/* Settings */}
-        <div
-          onClick={() => setShowSettingsDialog(true)}
-          className="w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
-        >
-          <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
-        </div>
-      </div>
-
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Product Grid */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Order Type & Actions Bar (36px) */}
-          <div className="flex-shrink-0 h-9 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+          {/* Order Type & Actions Bar (28px) - COMPACTED */}
+          <div className="flex-shrink-0 h-7 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
             {/* Order Type Selector */}
             <div className="flex items-center gap-1">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
@@ -2470,7 +2394,7 @@ export default function POSInterface() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex items-center gap-1 px-2 h-[32px] rounded-md text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
+                    className={`flex items-center gap-1 px-2 h-[24px] rounded-md text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
                       isActive
                         ? `bg-gradient-to-r ${config.gradient} text-white border-transparent shadow-sm`
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -2486,22 +2410,34 @@ export default function POSInterface() {
             {/* Spacer */}
             <div className="flex-1" />
 
+            {/* Daily Expenses Button - PROMINENT */}
+            {currentShift && (
+              <Button
+                onClick={() => setShowDailyExpenseDialog(true)}
+                variant="outline"
+                className="h-6 px-2 border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-md gap-1"
+              >
+                <TrendingUp className="h-3 w-3" />
+                <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+              </Button>
+            )}
+
             {/* Table Info (Dine In Only) */}
             {orderType === 'dine-in' && selectedTable && (
-              <div className="flex items-center gap-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-md">
-                <div className="w-5 h-5 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-[10px]">
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-md">
+                <div className="w-5 h-5 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-[8px]">
                   {selectedTable.tableNumber}
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                  Table {selectedTable.tableNumber}
+                <span className="text-[8px] font-bold text-emerald-700 dark:text-emerald-300">
+                  {selectedTable.tableNumber}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleDeselectTable}
-                  className="h-5 w-5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                  className="h-4 w-4 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800"
                 >
-                  <X className="h-2.5 w-2.5" />
+                  <X className="h-2 w-2" />
                 </Button>
               </div>
             )}
@@ -2511,9 +2447,9 @@ export default function POSInterface() {
               <Button
                 onClick={handleCloseTable}
                 size="sm"
-                className="h-7 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
+                className="h-6 px-2 text-[8px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
               >
-                <CheckCircle className="h-3 w-3 mr-1" />
+                <CheckCircle className="h-2.5 w-2.5 mr-1" />
                 Close
               </Button>
             )}
@@ -2523,9 +2459,9 @@ export default function POSInterface() {
               <Button
                 onClick={() => setShowTableGrid(true)}
                 size="sm"
-                className="h-7 px-2 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
+                className="h-6 px-2 text-[8px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-md"
               >
-                <Utensils className="h-3 w-3 mr-1" />
+                <Utensils className="h-2.5 w-2.5 mr-1" />
                 Table
               </Button>
             )}
@@ -2548,7 +2484,7 @@ export default function POSInterface() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <div className="animate-spin h-10 w-10 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full mx-auto mb-3" />
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Loading...</p>
+                  <p className="text-[8px]s text-slate-600 dark:text-slate-400 font-semibold">Loading...</p>
                 </div>
               </div>
             ) : filteredMenuItems.length === 0 ? (
@@ -2601,8 +2537,8 @@ export default function POSInterface() {
 
         {/* Right: Compact Cart Sidebar (300px) - SHOW ON LG (1024px+) */}
         <div className="hidden lg:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl">
-          {/* Cart Header (44px) */}
-          <div className="flex-shrink-0 h-[44px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
+          {/* Cart Header (40px) */}
+          <div className="flex-shrink-0 h-[40px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-bold text-slate-900 dark:text-white">
@@ -2613,6 +2549,20 @@ export default function POSInterface() {
               </Badge>
             </div>
             <div className="flex items-center gap-1">
+              {/* Alerts Button - Behind Held Orders */}
+              {lowStockAlerts.length > 0 && (
+                <div className="relative">
+                  <div
+                    onClick={() => setShowLowStockDialog(true)}
+                    className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:scale-105 transition-all"
+                  >
+                    <AlertTriangle className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {lowStockAlerts.length}
+                  </span>
+                </div>
+              )}
               <Button
                 onClick={() => setShowHeldOrdersDialog(true)}
                 size="icon"
@@ -2633,14 +2583,13 @@ export default function POSInterface() {
               )}
             </div>
           </div>
-
           {/* Cart Items (Scrollable - Takes All Available Space) */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="p-2 space-y-1.5">
               {currentCart.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                  <ShoppingCart className="h-8 w-8 opacity-30 mb-2" />
-                  <p className="text-xs font-medium">Add items to start</p>
+                  <ShoppingCart className="h-8 w-8 opacity-30 mb-1.5" />
+                  <p className="text-[8px]s font-medium">Add items to start</p>
                 </div>
               ) : (
                 currentCart.map((item) => (
@@ -2659,7 +2608,7 @@ export default function POSInterface() {
                           </div>
                         )}
                         {item.note && (
-                          <div className="text-[9px] text-slate-500 italic truncate">
+                          <div className="text-[8px] text-slate-500 italic truncate">
                             "{item.note}"
                           </div>
                         )}
@@ -2754,7 +2703,7 @@ export default function POSInterface() {
                   <Truck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
                   <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase">Delivery</span>
                   {deliveryFee > 0 && (
-                    <span className="text-[9px] font-medium text-amber-600">+{formatCurrency(deliveryFee, currency)}</span>
+                    <span className="text-[8px] font-medium text-amber-600">+{formatCurrency(deliveryFee, currency)}</span>
                   )}
                 </div>
                 <ChevronRight className={`h-3.5 w-3.5 text-amber-500 transition-transform ${!deliveryCollapsed ? 'rotate-90' : ''}`} />
@@ -2791,28 +2740,28 @@ export default function POSInterface() {
 
           {/* Daily Expenses - REMOVED (Now in header) */}
 
-          {/* Order Summary (COMPACT - 100px, STICKY) */}
-          <div className="flex-shrink-0 p-2.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky bottom-0 z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
-            <div className="space-y-0.5 mb-2">
-              <div className="flex justify-between text-[9px] text-slate-600 dark:text-slate-400">
+          {/* Order Summary (ULTRA-COMPACT - 80px, STICKY) */}
+          <div className="flex-shrink-0 p-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky bottom-0 z-10 shadow-[0_-2px_8px_rgba(0,0,0,0.08)]">
+            <div className="space-y-0.5 mb-1.5">
+              <div className="flex justify-between text-[8px] text-slate-600 dark:text-slate-400">
                 <span>Subtotal</span>
                 <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(subtotal, currency)}</span>
               </div>
               {deliveryFee > 0 && (
-                <div className="flex justify-between text-[9px] text-slate-600 dark:text-slate-400">
+                <div className="flex justify-between text-[8px] text-slate-600 dark:text-slate-400">
                   <span>Delivery</span>
                   <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(deliveryFee, currency)}</span>
                 </div>
               )}
               {(promoDiscount > 0 || loyaltyDiscount > 0) && (
-                <div className="flex justify-between text-[9px] text-orange-600 dark:text-orange-400">
+                <div className="flex justify-between text-[8px] text-orange-600 dark:text-orange-400">
                   <span>Discount</span>
                   <span className="font-bold">-{formatCurrency(promoDiscount + loyaltyDiscount, currency)}</span>
                 </div>
               )}
               <div className="flex justify-between items-center pt-0.5 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[11px] font-bold text-slate-900 dark:text-white">Total</span>
-                <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400">
+                <span className="text-[10px] font-bold text-slate-900 dark:text-white">Total</span>
+                <span className="text-[16px] font-black text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(total, currency)}
                 </span>
               </div>
@@ -2823,7 +2772,7 @@ export default function POSInterface() {
               <Button
                 onClick={() => handleCheckout('cash')}
                 disabled={processing || currentCart.length === 0}
-                className="w-full h-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20 font-bold text-[11px] rounded-md"
+                className="w-full h-7 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/20 font-bold text-[10px] rounded-md"
               >
                 <DollarSign className="h-3.5 w-3.5 mr-1" />
                 CASH
@@ -2833,7 +2782,7 @@ export default function POSInterface() {
                   onClick={handleCardPaymentClick}
                   disabled={processing || currentCart.length === 0}
                   variant="outline"
-                  className="flex-1 h-7 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[10px] rounded-md"
+                  className="flex-1 h-6 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[10px] rounded-md"
                 >
                   <CreditCard className="h-2.5 w-2.5 mr-1" />
                   CARD
@@ -2842,7 +2791,7 @@ export default function POSInterface() {
                   onClick={handleHoldOrder}
                   disabled={processing || currentCart.length === 0}
                   variant="outline"
-                  className="flex-1 h-7 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[9px] rounded-md"
+                  className="flex-1 h-6 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[8px] rounded-md"
                 >
                   <Pause className="h-2.5 w-2.5 mr-0.5" />
                   Hold
@@ -2914,7 +2863,7 @@ export default function POSInterface() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">Current Order</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-[8px]s text-slate-500 dark:text-slate-400">
                       {totalItems} {totalItems === 1 ? 'item' : 'items'}
                     </p>
                   </div>
@@ -2948,7 +2897,7 @@ export default function POSInterface() {
                         key={item.id}
                         className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-850 rounded-2xl p-3 border border-slate-200/50 dark:border-slate-700/50"
                       >
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-1.5">
                           <div className="flex-1 min-w-0 pr-2">
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
@@ -3046,7 +2995,7 @@ export default function POSInterface() {
               {/* Customer Section */}
               <div className="px-4 pb-4 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/20 dark:to-teal-950/20">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                  <div className="w-8 h-7 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
                     <User className="h-4 w-4 text-white" />
                   </div>
                   <div>
@@ -3062,9 +3011,9 @@ export default function POSInterface() {
                 />
                 {selectedAddress && (
                   <div className="space-y-2 mt-3">
-                    <div className="p-2.5 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                    <div className="p-2 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-emerald-200 dark:border-emerald-800">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs">
+                        <div className="flex items-center gap-2 text-[8px]s">
                           <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
                           <span className="text-slate-700 dark:text-slate-300">
                             {selectedAddress.customerName}
@@ -3083,8 +3032,8 @@ export default function POSInterface() {
                     </div>
 
                     {/* Promo Code Section - Always Visible When Customer Selected */}
-                <div className="p-2.5 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <Tag className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
                     <span className="text-[10px] font-bold text-orange-700 dark:text-orange-300">
                       Promo Code
@@ -3095,7 +3044,7 @@ export default function POSInterface() {
                       <div className="flex items-center gap-2">
                         <CheckCircle className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
                         <div>
-                          <p className="text-xs font-bold text-green-700 dark:text-green-300">
+                          <p className="text-[8px]s font-bold text-green-700 dark:text-green-300">
                             {promoCode}
                           </p>
                           <p className="text-[10px] text-green-600 dark:text-green-400">
@@ -3119,7 +3068,7 @@ export default function POSInterface() {
                         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                         onKeyPress={(e) => e.key === 'Enter' && handleValidatePromoCode()}
                         placeholder="Enter code..."
-                        className="flex-1 h-8 text-xs"
+                        className="flex-1 h-8 text-[8px]s"
                         disabled={validatingPromo}
                       />
                       <Button
@@ -3145,12 +3094,12 @@ export default function POSInterface() {
 
                 {/* Loyalty Redemption Section */}
                     {redeemedPoints === 0 && selectedAddress.loyaltyPoints !== undefined && selectedAddress.loyaltyPoints >= 100 && (
-                      <div className="p-2.5 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800">
+                      <div className="p-2 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Star className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                            <Star className="h-3.5 w-3.5 text-[8px]urple-600 dark:text-[8px]urple-400" />
                             <div>
-                              <p className="text-[10px] font-semibold text-purple-700 dark:text-purple-300">
+                              <p className="text-[10px] font-semibold text-[8px]urple-700 dark:text-[8px]urple-300">
                                 {selectedAddress.loyaltyPoints.toFixed(0)} pts available
                               </p>
                             </div>
@@ -3169,12 +3118,12 @@ export default function POSInterface() {
 
                     {/* Active Redemption Display */}
                     {redeemedPoints > 0 && (
-                      <div className="p-2.5 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
+                      <div className="p-2 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <CheckCircle className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
                             <div>
-                              <p className="text-xs font-bold text-green-700 dark:text-green-300">
+                              <p className="text-[8px]s font-bold text-green-700 dark:text-green-300">
                                 {redeemedPoints} pts redeemed
                               </p>
                               <p className="text-[10px] text-green-600 dark:text-green-400">
@@ -3201,7 +3150,7 @@ export default function POSInterface() {
               {orderType === 'delivery' && (
                 <div className="px-4 pb-4 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-amber-50/80 to-orange-50/80 dark:from-amber-950/20 dark:to-orange-950/20">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <div className="w-8 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
                       <Truck className="h-4 w-4 text-white" />
                     </div>
                     <h3 className="text-sm font-bold text-amber-700 dark:text-amber-400">Delivery Info</h3>
@@ -3214,13 +3163,13 @@ export default function POSInterface() {
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         placeholder="Enter full delivery address..."
                         rows={2}
-                        className="text-xs mt-1 resize-none rounded-xl h-20"
+                        className="text-[8px]s mt-1 resize-none rounded-xl h-20"
                       />
                     </div>
                     <div>
                       <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Area</Label>
                       <Select value={deliveryArea} onValueChange={setDeliveryArea}>
-                        <SelectTrigger className="text-xs h-10 mt-1 rounded-xl">
+                        <SelectTrigger className="text-[8px]s h-10 mt-1 rounded-xl">
                           <SelectValue placeholder="Select area" />
                         </SelectTrigger>
                         <SelectContent className="z-[150]">
@@ -3236,7 +3185,7 @@ export default function POSInterface() {
                       <div>
                         <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Assign Courier</Label>
                         <Select value={selectedCourierId} onValueChange={setSelectedCourierId}>
-                          <SelectTrigger className="text-xs h-10 mt-1 rounded-xl">
+                          <SelectTrigger className="text-[8px]s h-10 mt-1 rounded-xl">
                             <SelectValue placeholder="Select courier (optional)" />
                           </SelectTrigger>
                           <SelectContent className="z-[150]">
@@ -3282,8 +3231,8 @@ export default function POSInterface() {
                   )}
                   {loyaltyDiscount > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-purple-600 dark:text-purple-400 font-medium">Loyalty Discount ({redeemedPoints} pts)</span>
-                      <span className="font-bold text-purple-600 dark:text-purple-400">
+                      <span className="text-[8px]urple-600 dark:text-[8px]urple-400 font-medium">Loyalty Discount ({redeemedPoints} pts)</span>
+                      <span className="font-bold text-[8px]urple-600 dark:text-[8px]urple-400">
                         -{formatCurrency(loyaltyDiscount, currency)}
                       </span>
                     </div>
@@ -3332,11 +3281,11 @@ export default function POSInterface() {
       <Dialog open={variantDialogOpen} onOpenChange={setVariantDialogOpen}>
         <DialogContent className="sm:max-w-[520px] rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Layers className="h-5 w-5 text-white" />
               </div>
-              <DialogTitle className="text-xl font-bold">Select Variant</DialogTitle>
+              <DialogTitle className="text-[8px]l font-bold">Select Variant</DialogTitle>
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 pl-13">
               Choose an option for <span className="font-semibold text-slate-900 dark:text-white">{selectedItemForVariant?.name}</span>
@@ -3353,7 +3302,7 @@ export default function POSInterface() {
                     <span className="font-semibold text-blue-900 dark:text-blue-100">
                       {selectedItemForVariant.variants[0].variantType.name}
                     </span>
-                    <Badge variant="default" className="bg-purple-600 hover:bg-purple-700 ml-auto text-xs">
+                    <Badge variant="default" className="bg-purple-600 hover:bg-purple-700 ml-auto text-[8px]s">
                       Custom Input
                     </Badge>
                   </div>
@@ -3393,7 +3342,7 @@ export default function POSInterface() {
                         </Button>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <p className="text-[8px]s text-slate-600 dark:text-slate-400">
                       Enter a multiplier to calculate the price proportionally. For example, if the base is 500g and you want 62.5g (1/8), enter 0.125.
                     </p>
                     {customVariantValue && !isNaN(parseFloat(customVariantValue)) && parseFloat(customVariantValue) > 0 && (
@@ -3429,7 +3378,7 @@ export default function POSInterface() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Package className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <Package className="h-5 w-5 text-[8px]urple-600 dark:text-[8px]urple-400" />
                       <span className="font-bold text-slate-900 dark:text-white">
                         Use Custom Input
                       </span>
@@ -3474,11 +3423,11 @@ export default function POSInterface() {
                         )}
                       </div>
                       <div className="flex flex-col items-end ml-4">
-                        <div className="font-black text-xl text-emerald-600 dark:text-emerald-400">
+                        <div className="font-black text-[8px]l text-emerald-600 dark:text-emerald-400">
                           {formatCurrency(finalPrice, currency)}
                         </div>
                         {selectedVariant?.id === variant.id && (
-                          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-bold mt-1">
+                          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[8px]s font-bold mt-1">
                             <CheckCircle className="h-3 w-3" />
                             Selected
                           </div>
@@ -3606,11 +3555,11 @@ export default function POSInterface() {
       <Dialog open={showCardPaymentDialog} onOpenChange={setShowCardPaymentDialog}>
         <DialogContent className="max-w-md rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <CreditCard className="h-5 w-5 text-white" />
               </div>
-              <DialogTitle className="text-xl font-bold">Card Payment</DialogTitle>
+              <DialogTitle className="text-[8px]l font-bold">Card Payment</DialogTitle>
             </div>
             <DialogDescription>
               Enter the card transaction reference number after successful payment
@@ -3624,7 +3573,7 @@ export default function POSInterface() {
                   <p className="text-sm font-semibold text-blue-900 dark:text-blue-300">
                     Process payment on terminal first
                   </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-400">
+                  <p className="text-[8px]s text-blue-700 dark:text-blue-400">
                     Complete the card transaction on your payment terminal, then select the payment type and enter the reference number below.
                   </p>
                 </div>
@@ -3641,7 +3590,7 @@ export default function POSInterface() {
                     <CreditCard className="h-5 w-5 text-blue-600" />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">Card</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Credit/Debit Card</p>
+                      <p className="text-[8px]s text-slate-500 dark:text-slate-400">Credit/Debit Card</p>
                     </div>
                   </label>
                 </div>
@@ -3651,17 +3600,17 @@ export default function POSInterface() {
                     <Smartphone className="h-5 w-5 text-emerald-600" />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">Instapay</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Instant Payment</p>
+                      <p className="text-[8px]s text-slate-500 dark:text-slate-400">Instant Payment</p>
                     </div>
                   </label>
                 </div>
                 <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-500 transition-colors cursor-pointer bg-white dark:bg-slate-800">
                   <RadioGroupItem value="MOBILE_WALLET" id="mobile-wallet" className="border-slate-300" />
                   <label htmlFor="mobile-wallet" className="flex items-center gap-3 flex-1 cursor-pointer">
-                    <Smartphone className="h-5 w-5 text-purple-600" />
+                    <Smartphone className="h-5 w-5 text-[8px]urple-600" />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">Mobile Wallet</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Vodafone Cash, Etisalat, Orange</p>
+                      <p className="text-[8px]s text-slate-500 dark:text-slate-400">Vodafone Cash, Etisalat, Orange</p>
                     </div>
                   </label>
                 </div>
@@ -3689,7 +3638,7 @@ export default function POSInterface() {
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                <p className="text-xs text-amber-800 dark:text-amber-300">
+                <p className="text-[8px]s text-amber-800 dark:text-amber-300">
                   If the card transaction fails, click Cancel and pay with Cash instead
                 </p>
               </div>
@@ -3785,11 +3734,11 @@ export default function POSInterface() {
       <Dialog open={showDailyExpenseDialog} onOpenChange={setShowDailyExpenseDialog}>
         <DialogContent className="sm:max-w-md rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Wallet className="h-5 w-5 text-white" />
               </div>
-              <DialogTitle className="text-xl font-bold">Add Daily Expense</DialogTitle>
+              <DialogTitle className="text-[8px]l font-bold">Add Daily Expense</DialogTitle>
             </div>
             <DialogDescription>
               Record a daily expense for the current shift
@@ -3825,14 +3774,14 @@ export default function POSInterface() {
                 className="mt-1.5 resize-none rounded-xl"
                 maxLength={200}
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-[8px]s text-slate-500 mt-1">
                 {expenseReason.length}/200 characters
               </p>
             </div>
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
               <div className="flex items-start gap-2">
                 <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-blue-700 dark:text-blue-300">
+                <p className="text-[8px]s text-blue-700 dark:text-blue-300">
                   This expense will be automatically added to the Costs tab for tracking and reporting.
                 </p>
               </div>
@@ -3866,11 +3815,11 @@ export default function POSInterface() {
       <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
         <DialogContent className="sm:max-w-md rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
                 <MessageSquare className="h-5 w-5 text-white" />
               </div>
-              <DialogTitle className="text-xl font-bold">Edit Item</DialogTitle>
+              <DialogTitle className="text-[8px]l font-bold">Edit Item</DialogTitle>
             </div>
             <DialogDescription>
               {editingItem?.name} {editingItem?.variantName && `(${editingItem.variantName})`}
@@ -3899,12 +3848,12 @@ export default function POSInterface() {
                 className="mt-1.5 resize-none"
                 maxLength={200}
               />
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-[8px]s text-slate-500 mt-1">
                 {editingNote.length}/200 characters
               </p>
             </div>
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
-              <p className="text-xs text-amber-700 dark:text-amber-300">
+              <p className="text-[8px]s text-amber-700 dark:text-amber-300">
                 <strong>Tip:</strong> Items with different notes will appear on separate lines in the cart.
               </p>
             </div>
@@ -3937,12 +3886,12 @@ export default function POSInterface() {
       <Dialog open={showHeldOrdersDialog} onOpenChange={setShowHeldOrdersDialog}>
         <DialogContent className="sm:max-w-2xl rounded-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="pb-4 border-b">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Clock className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold">Held Orders</DialogTitle>
+                <DialogTitle className="text-[8px]l font-bold">Held Orders</DialogTitle>
                 <DialogDescription>
                   {heldOrders.length} {heldOrders.length === 1 ? 'order' : 'orders'} on hold
                 </DialogDescription>
@@ -3988,14 +3937,14 @@ export default function POSInterface() {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                        <div className="text-[8px]s text-slate-500 dark:text-slate-400">
                           {timeHeld < 60 ? `${timeHeld}m ago` : `${Math.floor(timeHeld / 60)}h ${timeHeld % 60}m ago`}
                         </div>
                       </div>
 
                       <div className="space-y-2 mb-3">
                         {heldOrder.items.slice(0, 3).map((item: any, idx: number) => (
-                          <div key={idx} className="flex justify-between text-xs">
+                          <div key={idx} className="flex justify-between text-[8px]s">
                             <span className="text-slate-600 dark:text-slate-300">
                               {item.name} {item.variantName && `(${item.variantName})`} x{item.quantity}
                             </span>
@@ -4005,7 +3954,7 @@ export default function POSInterface() {
                           </div>
                         ))}
                         {heldOrder.items.length > 3 && (
-                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                          <div className="text-[8px]s text-slate-500 dark:text-slate-400">
                             +{heldOrder.items.length - 3} more items
                           </div>
                         )}
@@ -4013,7 +3962,7 @@ export default function POSInterface() {
 
                       <div className="flex items-center justify-between pt-3 border-t border-slate-200/50 dark:border-slate-700/50">
                         <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="text-[8px]s text-slate-500 dark:text-slate-400">
                             {itemsCount} {itemsCount === 1 ? 'item' : 'items'}
                           </p>
                           <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
@@ -4061,12 +4010,12 @@ export default function POSInterface() {
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent className="sm:max-w-2xl rounded-3xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="pb-4 border-b">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
                 <ArrowRight className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold">Transfer Items</DialogTitle>
+                <DialogTitle className="text-[8px]l font-bold">Transfer Items</DialogTitle>
                 <DialogDescription>
                   From Table {selectedTable?.tableNumber} to another table
                 </DialogDescription>
@@ -4107,17 +4056,17 @@ export default function POSInterface() {
                             {item.name}
                           </h4>
                           {item.variantName && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{item.variantName}</p>
+                            <p className="text-[8px]s text-slate-500 dark:text-slate-400 mt-0.5">{item.variantName}</p>
                           )}
                           {item.note && (
-                            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 italic">"{item.note}"</p>
+                            <p className="text-[8px]s text-emerald-600 dark:text-emerald-400 mt-0.5 italic">"{item.note}"</p>
                           )}
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(item.price * item.quantity, currency)}
                           </p>
-                          <p className="text-xs text-slate-500">Available: {item.quantity}</p>
+                          <p className="text-[8px]s text-slate-500">Available: {item.quantity}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -4126,7 +4075,7 @@ export default function POSInterface() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleSetMaxQuantity(item.id)}
-                          className="h-8 text-xs"
+                          className="h-8 text-[8px]s"
                         >
                           <Check className="h-3 w-3 mr-1" />
                           All
@@ -4188,12 +4137,12 @@ export default function POSInterface() {
       <Dialog open={showLowStockDialog} onOpenChange={setShowLowStockDialog}>
         <DialogContent className="sm:max-w-md rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
                 <AlertTriangle className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold">Low Stock Alerts</DialogTitle>
+                <DialogTitle className="text-[8px]l font-bold">Low Stock Alerts</DialogTitle>
                 <DialogDescription>
                   {lowStockAlerts.length} item{lowStockAlerts.length !== 1 ? 's' : ''} running low
                 </DialogDescription>
@@ -4210,7 +4159,7 @@ export default function POSInterface() {
                   <div className="flex justify-between items-start mb-1">
                     <div className="flex-1">
                       <p className="font-bold text-sm text-amber-900 dark:text-amber-100">{alert.name}</p>
-                      <p className="text-xs text-amber-700 dark:text-amber-300">{alert.category || 'Uncategorized'}</p>
+                      <p className="text-[8px]s text-amber-700 dark:text-amber-300">{alert.category || 'Uncategorized'}</p>
                     </div>
                     <Badge variant="destructive" className="h-5 text-[10px]">
                       {alert.currentStock} left
@@ -4240,12 +4189,12 @@ export default function POSInterface() {
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
         <DialogContent className="sm:max-w-md rounded-3xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Settings className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold">Settings</DialogTitle>
+                <DialogTitle className="text-[8px]l font-bold">Settings</DialogTitle>
                 <DialogDescription>Account and system information</DialogDescription>
               </div>
             </div>
@@ -4259,10 +4208,10 @@ export default function POSInterface() {
                 </div>
                 <div>
                   <p className="font-bold text-slate-900 dark:text-white">{user?.username || 'Unknown'}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role || 'User'}</p>
+                  <p className="text-[8px]s text-slate-500 dark:text-slate-400 capitalize">{user?.role || 'User'}</p>
                 </div>
               </div>
-              <div className="space-y-1 text-xs">
+              <div className="space-y-1 text-[8px]s">
                 {user?.email && (
                   <div className="flex justify-between">
                     <span className="text-slate-500 dark:text-slate-400">Email</span>
@@ -4287,11 +4236,11 @@ export default function POSInterface() {
             {/* Shift Information (if cashier has shift open) */}
             {currentShift && (
               <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-1.5">
                   <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   <p className="font-bold text-emerald-900 dark:text-emerald-100 text-sm">Current Shift</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-2 gap-2 text-[8px]s">
                   <div>
                     <p className="text-emerald-700 dark:text-emerald-400">Orders</p>
                     <p className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">{currentShift.orderCount || 0}</p>
