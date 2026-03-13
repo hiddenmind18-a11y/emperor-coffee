@@ -1,4 +1,4 @@
-# 🚀 Quick Start: Prisma Accelerate Setup
+# 🚀 Quick Start: Prisma Accelerate Setupp
 
 ## ✅ What's Already Done
 
