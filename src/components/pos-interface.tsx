@@ -2373,7 +2373,7 @@ export default function POSInterface() {
         {/* Branch Selector (Admin Only) */}
         {user?.role === 'ADMIN' && (
           <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-28 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
+            <SelectTrigger className="w-24 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
               <SelectValue placeholder="Branch" />
             </SelectTrigger>
             <SelectContent>
@@ -2384,6 +2384,18 @@ export default function POSInterface() {
               ))}
             </SelectContent>
           </Select>
+        )}
+
+        {/* Daily Expenses Button (Compact) */}
+        {currentShift && (
+          <Button
+            onClick={() => setShowDailyExpenseDialog(true)}
+            variant="outline"
+            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+          </Button>
         )}
 
         {/* User & Settings */}
@@ -2410,49 +2422,41 @@ export default function POSInterface() {
         </div>
       </div>
 
-      {/* CATEGORY DROPDOWN (32px) */}
-      <div className="flex-shrink-0 h-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
-        <div className="flex-1">
-          <Select value={selectedCategory} onValueChange={(val) => { setSelectedCategory(val); setSearchQuery(''); }}>
-            <SelectTrigger className="h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs font-bold">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {allCategories.map((category) => {
-                const isActive = selectedCategory === category.id;
-                const categoryColor = getCategoryColor(category.name);
-                const itemCount = category.id === 'all'
-                  ? menuItems.length
-                  : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
+      {/* HORIZONTAL CATEGORY TABS (40px) - RESTORED */}
+      <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div className="flex items-center h-full gap-1 px-2">
+          {allCategories.map((category) => {
+            const isActive = selectedCategory === category.id;
+            const categoryColor = getCategoryColor(category.name);
+            const itemCount = category.id === 'all'
+              ? menuItems.length
+              : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
 
-                return (
-                  <SelectItem key={category.id} value={category.id} className="text-xs">
-                    <div className="flex items-center gap-2 w-full">
-                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${categoryColor}`} />
-                      <span>{category.name}</span>
-                      {category.id !== 'all' && (
-                        <span className="ml-auto text-[10px] text-slate-500">({itemCount})</span>
-                      )}
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+            return (
+              <button
+                key={category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  setSearchQuery('');
+                }}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 h-[36px] rounded-md text-[10px] font-bold transition-all duration-200 border active:scale-95 ${
+                  isActive
+                    ? `bg-gradient-to-r shadow-sm ${categoryColor} text-white border-transparent`
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                <span className="whitespace-nowrap">{category.name}</span>
+                {category.id !== 'all' && (
+                  <span className={`px-1 py-0.5 rounded-full text-[8px] font-semibold ${
+                    isActive ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-700'
+                  }`}>
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-
-        {/* Daily Expenses Button (IN HEADER - Always Visible) */}
-        {currentShift && (
-          <Button
-            onClick={() => setShowDailyExpenseDialog(true)}
-            variant="outline"
-            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
-          >
-            <TrendingUp className="h-3 w-3" />
-            <span className="hidden sm:inline">Expenses</span>
-            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
-          </Button>
-        )}
       </div>
 
       {/* MAIN CONTENT AREA */}

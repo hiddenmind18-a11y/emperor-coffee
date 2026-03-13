@@ -718,222 +718,33 @@ export default function POSDashboard() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-2 sm:px-4 py-4 sm:py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Desktop Tabs - Hidden on mobile */}
-          <TabsList className="hidden lg:flex flex-wrap w-full bg-white/60 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/200 p-1">
-            {/* POS - Available to all roles */}
-            {canAccessPOS && (
-              <TabsTrigger value="pos" className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700">
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                {t('dashboard.pos')}
-              </TabsTrigger>
-            )}
-            {/* Menu - HQ Admin only */}
-            {canAccessHQFeatures && (
-              <TabsTrigger
-                value="menu"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Utensils className="h-4 w-4 mr-2" />
-                {t('dashboard.menu')}
-              </TabsTrigger>
-            )}
-            {/* Recipes - HQ Admin only */}
-            {canAccessHQFeatures && (
-              <TabsTrigger
-                value="recipes"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Package className="h-4 w-4 mr-2" />
-                {t('dashboard.recipes')}
-              </TabsTrigger>
-            )}
-            {/* Ingredients - Branch Manager and above */}
-            {canAccessInventory && (
-              <TabsTrigger
-                value="ingredients"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Store className="h-4 w-4 mr-2" />
-                {t('dashboard.ingredients')}
-              </TabsTrigger>
-            )}
-            {/* Inventory Alerts - Branch Manager and above */}
-            {canAccessInventory && (
-              <TabsTrigger
-                value="inventory-alerts"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Alerts
-              </TabsTrigger>
-            )}
-            {/* Transfers - Branch Manager and above */}
-            {canAccessTransfers && (
-              <TabsTrigger
-                value="transfers"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <ArrowRight className="h-4 w-4 mr-2" />
-                Transfers
-              </TabsTrigger>
-            )}
-            {/* Waste - Branch Manager and above */}
-            {canAccessInventory && (
-              <TabsTrigger
-                value="waste"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Waste
-              </TabsTrigger>
-            )}
-            {/* Loyalty - Branch Manager and above */}
-            {canAccessCustomers && (
-              <TabsTrigger
-                value="loyalty"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <Gift className="h-4 w-4 mr-2" />
-                Loyalty
-              </TabsTrigger>
-            )}
-            {/* Promo Codes - Branch Manager and above */}
-            {canAccessCustomers && (
-              <TabsTrigger
-                value="promo-codes"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Tag className="h-4 w-4 mr-2" />
-                Promo Codes
-              </TabsTrigger>
-            )}
-            {/* Suppliers - Branch Manager and above */}
-            {canAccessSuppliers && (
-              <TabsTrigger
-                value="suppliers"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Building className="h-4 w-4 mr-2" />
-                Suppliers
-              </TabsTrigger>
-            )}
-            {/* Purchase Orders - Branch Manager and above */}
-            {canAccessPurchaseOrders && (
-              <TabsTrigger
-                value="purchase-orders"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Purchase Orders
-              </TabsTrigger>
-            )}
-            {/* Branches - HQ Admin only */}
-            {canAccessHQFeatures && (
-              <TabsTrigger
-                value="branches"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                {t('dashboard.branches')}
-              </TabsTrigger>
-            )}
-            {/* Reports - Branch Manager and above */}
-            {canAccessBranchFeatures && (
-              <TabsTrigger
-                value="reports"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                {t('dashboard.reports')}
-              </TabsTrigger>
-            )}
-            {/* Audit Logs - Branch Manager and above */}
-            {canAccessAuditLogs && (
-              <TabsTrigger
-                value="audit-logs"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Audit Logs
-              </TabsTrigger>
-            )}
-            {/* Users - Branch Manager and above */}
-            {canAccessUsers && (
-              <TabsTrigger
-                value="users"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                {t('dashboard.users')}
-              </TabsTrigger>
-            )}
-            {/* Shifts - Available to all roles */}
-            {canAccessShifts && (
-              <TabsTrigger
-                value="shifts"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                Shifts
-              </TabsTrigger>
-            )}
-            {/* Delivery - Branch Manager and above */}
-            {canAccessDelivery && (
-              <TabsTrigger
-                value="delivery"
-                className="data-[state=active]:bg-white text-emerald-700 hover:bg-emerald-50"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Delivery
-              </TabsTrigger>
-            )}
-            {/* Customers - Branch Manager and above */}
-            {canAccessCustomers && (
-              <TabsTrigger
-                value="customers"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <UserRound className="h-4 w-4 mr-2" />
-                Customers
-              </TabsTrigger>
-            )}
-            {/* Costs - Branch Manager and above */}
-            {canAccessCosts && (
-              <TabsTrigger
-                value="costs"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <DollarSign className="h-4 w-4 mr-2" />
-                Costs
-              </TabsTrigger>
-            )}
-            {/* Receipt Settings - Admin only */}
-            {canAccessHQFeatures && (
-              <TabsTrigger
-                value="receipt"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <ReceiptIcon className="h-4 w-4 mr-2" />
-                Receipt
-              </TabsTrigger>
-            )}
-            {/* Tables - Admin only */}
-            {canAccessTables && (
-              <TabsTrigger
-                value="tables"
-                className="data-[state=active]:bg-gradient-to-r from-emerald-600 to-emerald-700 text-emerald-700 hover:bg-emerald-50"
-              >
-                <LayoutGrid className="h-4 w-4 mr-2" />
-                Tables
-              </TabsTrigger>
-            )}
-          </TabsList>
+      {/* Main Content - Full Height, No Footer */}
+      <main className="flex-1 px-2 sm:px-4 py-2">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+          {/* Compact Navigation Dropdown - Desktop */}
+          <div className="hidden lg:block mb-3 flex-shrink-0">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full h-9 bg-white/60 backdrop-blur-md border-slate-200 rounded-xl shadow-xl font-bold text-emerald-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <SelectItem key={item.id} value={item.id}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <div className="mt-6">
-            <TabsContent value="pos" className="space-y-4">
+          <div className="flex-1 min-h-0">
+            <TabsContent value="pos" className="h-full m-0 p-0">
               {canAccessPOS ? (
                 <POSInterface />
               ) : (
@@ -1132,15 +943,6 @@ export default function POSDashboard() {
         onResolveAll={handleResolveAllConflicts}
       />
 
-      {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-md border-t border-slate-200/200 mt-auto">
-        <div className="px-2 sm:px-4 py-3 sm:py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-slate-500">
-            <p>© 2026 Emperor Coffee. All rights reserved.</p>
-            <div className="text-slate-400">Premium POS System</div>
-          </div>
-        </div>
-      </footer>
       </div>
     </div>
   );
