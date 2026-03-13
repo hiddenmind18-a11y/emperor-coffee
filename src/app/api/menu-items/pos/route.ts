@@ -53,20 +53,21 @@ export async function GET(request: NextRequest) {
               priceModifier: true,
               sortOrder: true,
               isActive: true,
+              // variantType and variantOption are at the SAME level (not nested)
+              variantType: {
+                select: {
+                  id: true,
+                  name: true,
+                  isCustomInput: true,
+                  isActive: true,
+                },
+              },
               variantOption: {
                 select: {
                   id: true,
                   name: true,
                   sortOrder: true,
                   isActive: true,
-                  variantType: {
-                    select: {
-                      id: true,
-                      name: true,
-                      isCustomInput: true,
-                      isActive: true,
-                    },
-                  },
                 },
               },
             },
