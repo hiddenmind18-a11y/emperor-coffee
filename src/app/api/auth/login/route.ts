@@ -119,8 +119,18 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Login error:', error);
+    console.error('Error message:', error?.message);
+    console.error('Error stack:', error?.stack);
+    console.error('Error code:', error?.code);
+
+    // More detailed error for debugging
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      {
+        success: false,
+        error: 'Internal server error',
+        debugMessage: error?.message || 'Unknown error',
+        debugCode: error?.code || 'UNKNOWN'
+      },
       { status: 500 }
     );
   }
