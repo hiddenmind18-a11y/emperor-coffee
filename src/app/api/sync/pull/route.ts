@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
       force = false, 
       sinceDate, 
       limit = 100,
-      includeVariants = false,  // Don't include variants by default
-      includeOrders = true      // Include orders by default but limited
-    };
+      includeVariants = false,
+      includeOrders = true
+    } = body;
 
     if (!branchId) {
       return NextResponse.json(
