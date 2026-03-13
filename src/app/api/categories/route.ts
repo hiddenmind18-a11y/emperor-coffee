@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
         { sortOrder: 'asc' },
         { name: 'asc' },
       ],
+      // REMOVED: imagePath - causes massive data transfer
+      // Categories on touch monitors don't need images
       select: {
         id: true,
         name: true,
@@ -21,7 +23,6 @@ export async function GET(request: NextRequest) {
         sortOrder: true,
         isActive: true,
         defaultVariantTypeId: true,
-        imagePath: true,
         _count: {
           select: { menuItems: true },
         },

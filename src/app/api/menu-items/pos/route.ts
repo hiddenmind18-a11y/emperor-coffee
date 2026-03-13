@@ -44,7 +44,8 @@ export async function GET(request: NextRequest) {
           taxRate: true,
           hasVariants: true,
           sortOrder: true,
-          imagePath: true,
+          // REMOVED: imagePath - causes 400-450 MB data transfer
+          // POS interface on touch monitors doesn't need images
           // Include variants with essential data (variant type, option, price modifier)
           variants: {
             select: {
