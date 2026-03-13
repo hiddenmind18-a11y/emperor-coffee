@@ -2325,13 +2325,92 @@ export default function POSInterface() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
-      {/* Mobile Categories - Horizontal Scroll Bar */}
-      <div className="md:hidden flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 px-2 py-2">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
+      {/* PROFESSIONAL POS HEADER (40px) */}
+      <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+        {/* Logo/Brand */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
+            <Store className="h-4 w-4 text-white" />
+          </div>
+          <div className="hidden sm:block">
+            <h1 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">Emperor</h1>
+            <p className="text-[9px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase -mt-0.5">POS</p>
+          </div>
+        </div>
+
+        {/* Separator */}
+        <Separator orientation="vertical" className="h-6 hidden sm:block" />
+
+        {/* Search Bar - Full Width */}
+        <div className="flex-1 max-w-2xl relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          <Input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-8 h-8 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400 hover:text-slate-600"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+
+        {/* Branch Selector (Admin Only) */}
+        {user?.role === 'ADMIN' && (
+          <>
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+              <SelectTrigger className="w-32 h-8 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
+                <SelectValue placeholder="Branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </>
+        )}
+
+        {/* User & Settings */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {lowStockAlerts.length > 0 && (
+            <div className="relative group">
+              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition-all">
+                <AlertTriangle className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {lowStockAlerts.length}
+              </span>
+            </div>
+          )}
+          <div className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition-all">
+            <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+          </div>
+        </div>
+      </div>
+
+      {/* HORIZONTAL CATEGORY TABS (50px) */}
+      <div className="flex-shrink-0 h-[50px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div className="flex items-center h-full gap-1 px-2">
           {allCategories.map((category) => {
             const isActive = selectedCategory === category.id;
             const categoryColor = getCategoryColor(category.name);
+            const itemCount = category.id === 'all' 
+              ? menuItems.length 
+              : menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length;
+
             return (
               <button
                 key={category.id}
@@ -2339,693 +2418,459 @@ export default function POSInterface() {
                   setSelectedCategory(category.id);
                   setSearchQuery('');
                 }}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-2 h-10 rounded-xl text-[10px] font-bold transition-all duration-300 border ${
+                className={`flex-shrink-0 flex items-center gap-2 px-4 h-[48px] rounded-lg text-xs font-bold transition-all duration-200 border active:scale-95 ${
                   isActive
-                    ? `bg-gradient-to-r shadow-md shadow-emerald-500/30 ring-1 ring-emerald-500/50 ${categoryColor} text-white`
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? `bg-gradient-to-r shadow-sm ${categoryColor} text-white border-transparent`
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <span className="whitespace-nowrap">{category.name}</span>
+                {category.id !== 'all' && (
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold ${
+                    isActive ? 'bg-white/20' : 'bg-slate-300 dark:bg-slate-700'
+                  }`}>
+                    {itemCount}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Left Sidebar - Modern Categories (Desktop) */}
-      {categoriesExpanded && (
-        <div className="hidden md:flex flex-col w-56 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0 h-full overflow-hidden">
-          {/* Logo/Brand Section - Compact */}
-          <div className="flex-shrink-0 p-3 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/30">
-                <Store className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight">Emperor</h1>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase">POS</p>
-              </div>
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left: Product Grid */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Order Type & Actions Bar (44px) */}
+          <div className="flex-shrink-0 h-11 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
+            {/* Order Type Selector */}
+            <div className="flex items-center gap-1">
+              {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
+                const configs = {
+                  'dine-in': { icon: <Utensils className="h-3.5 w-3.5" />, label: 'Dine In', gradient: 'from-purple-500 to-violet-600' },
+                  'take-away': { icon: <Package className="h-3.5 w-3.5" />, label: 'Take Away', gradient: 'from-amber-500 to-orange-600' },
+                  'delivery': { icon: <Truck className="h-3.5 w-3.5" />, label: 'Delivery', gradient: 'from-blue-500 to-cyan-600' },
+                };
+                const config = configs[type];
+                const isActive = orderType === type;
+
+                return (
+                  <button
+                    key={type}
+                    onClick={() => setOrderType(type)}
+                    className={`flex items-center gap-1.5 px-3 h-[40px] rounded-lg text-[11px] font-bold transition-all duration-200 border active:scale-95 ${
+                      isActive
+                        ? `bg-gradient-to-r ${config.gradient} text-white border-transparent shadow-sm`
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {config.icon}
+                    <span className="hidden sm:inline">{config.label}</span>
+                  </button>
+                );
+              })}
             </div>
-          </div>
 
-          {/* Categories Section - Compact */}
-          <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-            <div className="flex-shrink-0 px-3 py-2 border-b border-slate-200/50 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/30">
-              <h2 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                <Filter className="h-3 w-3" />
-                Categories
-              </h2>
-            </div>
+            {/* Spacer */}
+            <div className="flex-1" />
 
-            <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-full px-2 py-2">
-                <div className="space-y-1">
-                  {allCategories.map((category) => {
-                    const isActive = selectedCategory === category.id;
-                    return (
-                      <button
-                        key={category.id}
-                        onClick={() => {
-                          setSelectedCategory(category.id);
-                          setSearchQuery('');
-                        }}
-                        className={`w-full group relative overflow-hidden rounded-xl p-0 text-left transition-all duration-300 ${
-                          isActive
-                            ? 'bg-gradient-to-r shadow-md shadow-emerald-500/20 ring-1 ring-emerald-500/30'
-                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
-                        }`}
-                        style={isActive ? { background: `linear-gradient(to right, var(--tw-gradient-stops))`, '--tw-gradient-from': `var(--color-${category.color.split('-')[0]}-500)`, '--tw-gradient-to': `var(--color-${category.color.split('-')[2]}-600)` } as React.CSSProperties : {}}
-                      >
-                        <div className={`bg-gradient-to-r ${category.color} absolute inset-0 opacity-0 ${isActive ? 'opacity-100' : ''} transition-opacity duration-300`} />
-
-                        <div className="relative flex items-center gap-2 p-2">
-                          <div className="flex-1 min-w-0">
-                            <span className={`font-bold text-xs block truncate transition-colors ${
-                              isActive ? 'text-white' : 'text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
-                            }`}>
-                              {category.name}
-                            </span>
-                            {category.id !== 'all' && (
-                              <span className={`text-[10px] mt-0.5 block font-medium transition-colors ${
-                                isActive ? 'text-white/80' : 'text-slate-400 dark:text-slate-500'
-                              }`}>
-                                {menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length}
-                              </span>
-                            )}
-                          </div>
-
-                          {isActive ? (
-                            <div className="w-5 h-5 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
-                              <CheckCircle className="h-3 w-3 text-white" />
-                            </div>
-                          ) : (
-                            <ChevronRight className="h-3 w-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors flex-shrink-0" />
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
+            {/* Table Info (Dine In Only) */}
+            {orderType === 'dine-in' && selectedTable && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                <div className="w-6 h-6 bg-emerald-600 rounded flex items-center justify-center text-white font-bold text-xs">
+                  {selectedTable.tableNumber}
                 </div>
-              </ScrollArea>
-            </div>
-          </div>
-
-          {/* Low Stock Alert - Compact */}
-          {lowStockAlerts.length > 0 && (
-            <div className="flex-shrink-0 p-2 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
-              <div className="flex items-start gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-amber-500/30">
-                  <AlertTriangle className="h-3 w-3 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400">{lowStockAlerts.length} low</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Center - Menu Items */}
-      <div className="flex-1 flex flex-col min-w-0 relative">
-        {/* Compact Top Bar */}
-        <div className="flex-shrink-0 px-3 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-          <div className="flex items-center gap-2">
-            {/* Sidebar Toggle Button - Compact */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="hidden md:flex h-8 w-8 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50"
-              title={categoriesExpanded ? 'Hide Sidebar' : 'Show Sidebar'}
-            >
-              {categoriesExpanded ? (
-                <PanelLeftClose className="h-3.5 w-3.5" />
-              ) : (
-                <PanelLeftOpen className="h-3.5 w-3.5" />
-              )}
-            </Button>
-
-            {/* Collapsible Search Toggle - Compact */}
-            {!searchExpanded ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSearchExpanded(true)}
-                className="h-8 w-8 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50 relative"
-                title="Search products"
-              >
-                <Search className="h-3.5 w-3.5" />
-                {searchQuery && (
-                  <span className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-white">●</span>
-                  </span>
-                )}
-              </Button>
-            ) : (
-              <div className="flex-1 max-w-xs relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-500 transition-colors z-10" />
-                <Input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-8 h-8 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs transition-all relative z-0"
-                  autoFocus
-                />
+                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                  Table {selectedTable.tableNumber}
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    setSearchExpanded(false);
-                    setSearchQuery('');
-                  }}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  onClick={handleDeselectTable}
+                  className="h-6 w-6 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3 w-3" />
                 </Button>
               </div>
             )}
 
-            {/* Compact Order Type Buttons (Desktop) */}
-            <div className="hidden md:flex items-center gap-2">
-              {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
-                const configs = {
-                  'dine-in': {
-                    icon: <Utensils className="h-4 w-4" />,
-                    label: 'Dine In',
-                    gradient: 'from-purple-500 to-violet-600',
-                    bg: 'bg-purple-50 dark:bg-purple-950/30',
-                    border: 'border-purple-200 dark:border-purple-800',
-                    text: 'text-purple-600 dark:text-purple-400',
-                  },
-                  'take-away': {
-                    icon: <Package className="h-4 w-4" />,
-                    label: 'Take Away',
-                    gradient: 'from-amber-500 to-orange-600',
-                    bg: 'bg-amber-50 dark:bg-amber-950/30',
-                    border: 'border-amber-200 dark:border-amber-800',
-                    text: 'text-amber-600 dark:text-amber-400',
-                  },
-                  'delivery': {
-                    icon: <Truck className="h-4 w-4" />,
-                    label: 'Delivery',
-                    gradient: 'from-blue-500 to-cyan-600',
-                    bg: 'bg-blue-50 dark:bg-blue-950/30',
-                    border: 'border-blue-200 dark:border-blue-800',
-                    text: 'text-blue-600 dark:text-blue-400',
-                  },
-                };
-                const config = configs[type];
-                const isActive = orderType === type;
+            {/* Close Table Button (Dine In) */}
+            {orderType === 'dine-in' && selectedTable && tableCart.length > 0 && (
+              <Button
+                onClick={handleCloseTable}
+                size="sm"
+                className="h-9 px-3 text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+              >
+                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                Close Table
+              </Button>
+            )}
 
-                return (
-                  <button
-                    key={type}
-                    onClick={() => setOrderType(type)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md ${
-                      isActive
-                        ? `bg-gradient-to-r ${config.gradient} text-white shadow-md`
-                        : `${config.bg} ${config.border} ${config.text} hover:shadow-sm`
-                    }`}
-                    aria-label={`Switch to ${config.label}`}
-                    aria-pressed={isActive}
-                  >
-                    <span className={`flex items-center justify-center w-6 h-6 rounded-lg ${
-                      isActive ? 'bg-white/20' : 'bg-white/50 dark:bg-white/10'
-                    }`}>
-                      {config.icon}
-                    </span>
-                    <span className="whitespace-nowrap">{config.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Mobile Order Type Selector - Compact */}
-            <div className="md:hidden flex items-center gap-1">
-              {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
-                const configs = {
-                  'dine-in': {
-                    icon: <Utensils className="h-3.5 w-3.5" />,
-                    gradient: 'from-purple-500 to-violet-600',
-                  },
-                  'take-away': {
-                    icon: <Package className="h-3.5 w-3.5" />,
-                    gradient: 'from-amber-500 to-orange-600',
-                  },
-                  'delivery': {
-                    icon: <Truck className="h-3.5 w-3.5" />,
-                    gradient: 'from-blue-500 to-cyan-600',
-                  },
-                };
-                const config = configs[type];
-                const isActive = orderType === type;
-
-                return (
-                  <button
-                    key={type}
-                    onClick={() => setOrderType(type)}
-                    className={`flex flex-col items-center justify-center p-1.5 rounded-lg transition-all duration-300 ${
-                      isActive
-                        ? `bg-gradient-to-br ${config.gradient} text-white shadow-md`
-                        : 'bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50'
-                    }`}
-                    aria-label={`Switch to ${type}`}
-                    aria-pressed={isActive}
-                  >
-                    <span className="flex items-center justify-center w-6 h-6 rounded-md">
-                      {config.icon}
-                    </span>
-                    <span className="text-[8px] font-bold mt-0.5 leading-tight">
-                      {type === 'dine-in' && 'Dine'}
-                      {type === 'take-away' && 'Away'}
-                      {type === 'delivery' && 'Deliv'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Branch Selector for Admin - Compact */}
-            {user?.role === 'ADMIN' && (
-              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-                <SelectTrigger className="w-32 h-8 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs">
-                  <SelectValue placeholder="Branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {branches.map((branch) => (
-                    <SelectItem key={branch.id} value={branch.id}>
-                      {branch.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Select Table Button (Dine In) */}
+            {orderType === 'dine-in' && !selectedTable && (
+              <Button
+                onClick={() => setShowTableGrid(true)}
+                size="sm"
+                className="h-9 px-3 text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+              >
+                <Utensils className="h-3.5 w-3.5 mr-1" />
+                Select Table
+              </Button>
             )}
           </div>
-        </div>
 
-        {/* Compact Products Grid */}
-        <div className="flex-1 overflow-y-auto p-2 pb-2">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="animate-spin h-8 w-8 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full mx-auto mb-2" />
-                <p className="text-xs text-slate-600 dark:text-slate-400">Loading...</p>
-              </div>
+          {/* Table Grid Overlay (Dine In) */}
+          {orderType === 'dine-in' && showTableGrid && (
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900/50">
+              <TableGridView
+                branchId={user?.role === 'CASHIER' ? user?.branchId : selectedBranch}
+                onTableSelect={handleTableSelect}
+                selectedTableId={selectedTable?.id || null}
+              />
             </div>
-          ) : filteredMenuItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400">
-              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mb-2">
-                <Search className="h-6 w-6 opacity-40" />
-              </div>
-              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">No products</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-              {filteredMenuItems.map((item) => {
-                const categoryColor = getCategoryColor(item.category);
+          )}
 
-                return (
-                  <Card
-                    key={item.id}
-                    onClick={() => handleItemClick(item)}
-                    className="group cursor-pointer border-0 bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-0.5"
-                  >
-                    {/* Compact Product Card - No Images */}
-                    <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
+          {/* Product Grid */}
+          <div className={`flex-1 overflow-y-auto p-4 ${orderType === 'dine-in' && showTableGrid ? 'hidden' : ''}`}>
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="animate-spin h-10 w-10 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full mx-auto mb-3" />
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Loading...</p>
+                </div>
+              </div>
+            ) : filteredMenuItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-3">
+                  <Search className="h-8 w-8 opacity-40" />
+                </div>
+                <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">No products found</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+                {filteredMenuItems.map((item) => {
+                  const categoryColor = getCategoryColor(item.category);
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item)}
+                      className="group relative aspect-square bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-200 border border-slate-200 dark:border-slate-700 active:scale-95"
+                    >
+                      {/* Category Color Bar (Top 4px) */}
+                      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${categoryColor}`} />
+
                       {/* Gradient Background */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-10 group-hover:opacity-20 transition-all duration-300`} />
+                      <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-5 group-hover:opacity-10 transition-opacity duration-200`} />
 
-                      {/* Gradient Overlay for Text Readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
-
-                      {/* Variants Badge - Top Right */}
-                      {item.hasVariants && (
-                        <div className="absolute top-1.5 right-1.5">
-                          <div className={`bg-gradient-to-br ${categoryColor} text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5`}>
-                            <Layers className="h-2 w-2" />
-                            <span>{item.variants?.length || 0}</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Product Info Overlay - Bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 p-2 pt-4">
+                      {/* Content */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-3 pt-5">
                         {/* Product Name */}
-                        <h3 className="font-bold text-xs text-white leading-tight line-clamp-2 mb-1 drop-shadow">
+                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-2">
                           {item.name}
                         </h3>
-                        
-                        {/* Price */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-white drop-shadow">
-                            {formatCurrency(item.price, currency)}
-                          </span>
-                          
-                          {/* Quick Add Button */}
-                          <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${categoryColor} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300`}>
-                            <Plus className="h-3 w-3 text-white" />
+
+                        {/* Variants Badge */}
+                        {item.hasVariants && (
+                          <div className="mb-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${categoryColor} text-white`}>
+                              {item.variants?.length || 0} variants
+                            </span>
                           </div>
+                        )}
+
+                        {/* Price */}
+                        <div className={`text-[18px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
+                          {formatCurrency(item.price, currency)}
                         </div>
                       </div>
 
-                      {/* Hover Effect */}
-                      <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-all duration-300" />
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Right Sidebar - Cart (Desktop) - Compact */}
-      <div className="hidden lg:flex flex-col h-full w-[320px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-l border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0">
-        {/* Cart Header - Compact */}
-        <div className="p-3 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-850/50">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/30">
-                <ShoppingCart className="h-3.5 w-3.5 text-white" />
+                      {/* Quick Add Indicator */}
+                      <div className={`absolute bottom-3 right-3 w-8 h-8 rounded-full bg-gradient-to-r ${categoryColor} flex items-center justify-center shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-200`}>
+                        <Plus className="h-4 w-4 text-white" />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Order</h2>
-            </div>
-            <Badge variant="outline" className="bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold px-2 py-0.5 rounded-full text-[10px]">
-              {totalItems}
-            </Badge>
+            )}
           </div>
-          {/* Held Orders Button - Compact */}
-          <div className="mt-2 flex gap-1">
-            {orderType === 'dine-in' && selectedTable && tableCart.length > 0 && (
+        </div>
+
+        {/* Right: Cart Sidebar (320px) */}
+        <div className="hidden xl:flex flex-col w-[320px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
+          {/* Cart Header (60px) */}
+          <div className="flex-shrink-0 h-[60px] px-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-850/50">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/30">
+                <ShoppingCart className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Order</h2>
+                {orderType === 'dine-in' && selectedTable && (
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Table {selectedTable.tableNumber}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              {/* Held Orders Button */}
               <Button
-                onClick={handleOpenTransferDialog}
+                onClick={() => setShowHeldOrdersDialog(true)}
                 size="sm"
                 variant="outline"
-                className="flex-1 h-7 text-[10px] border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50"
+                className="h-8 px-2 text-[10px] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
               >
-                <ArrowRight className="h-3 w-3 mr-1" />
-                Transfer
+                <Clock className="h-3 w-3 mr-1" />
+                Held {heldOrders.length > 0 && `(${heldOrders.length})`}
               </Button>
-            )}
-            <Button
-              onClick={() => setShowHeldOrdersDialog(true)}
-              size="sm"
-              variant="outline"
-              className={`flex-1 h-7 text-[10px] border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 ${orderType === 'dine-in' && selectedTable && tableCart.length > 0 ? '' : 'flex-1'}`}
-            >
-              <Clock className="h-3 w-3 mr-1" />
-              Held {heldOrders.length > 0 && `(${heldOrders.length})`}
-            </Button>
-          </div>
-        </div>
-
-        {/* Cart Items - Compact */}
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <ScrollArea className="h-full p-2">
-            {currentCart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 p-4">
-                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mb-2">
-                  <ShoppingCart className="h-6 w-6 opacity-40" />
-                </div>
-                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Empty</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {currentCart.map((item) => (
-                <div
-                  key={item.id}
-                  className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-850 rounded-xl p-2 border border-slate-200/50 dark:border-slate-700/50 hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-300"
+              {/* Transfer Button (Dine In) */}
+              {orderType === 'dine-in' && selectedTable && tableCart.length > 0 && (
+                <Button
+                  onClick={handleOpenTransferDialog}
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-2 text-[10px] border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1 min-w-0 pr-2">
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 leading-tight">
-                        {item.name}
-                      </h4>
-                      {item.variantName && (
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5">
-                          {item.variantName}
-                        </div>
-                      )}
-                      {item.note && (
-                        <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 italic">
-                          "{item.note}"
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 flex-shrink-0 rounded-lg"
-                        onClick={() => openNoteDialog(item)}
-                      >
-                        <Edit3 className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 flex-shrink-0 rounded-lg"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
+                  <ArrowRight className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Cart Items (Scrollable) */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="p-3 space-y-2">
+              {currentCart.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                  <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-3">
+                    <ShoppingCart className="h-7 w-7 opacity-40" />
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-6 w-6 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-xs"
-                        onClick={() => handleDecrementQuantity(item.id)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-8 text-center font-bold text-xs text-slate-900 dark:text-white">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-6 w-6 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-xs"
-                        onClick={() => handleIncrementQuantity(item.id)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                        {formatCurrency(item.price * item.quantity, currency)}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Cart is empty</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-        </div>
+              ) : (
+                currentCart.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white dark:bg-slate-900 rounded-xl p-2 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <h4 className="text-[13px] font-bold text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                          {item.name}
+                        </h4>
+                        {item.variantName && (
+                          <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
+                            {item.variantName}
+                          </div>
+                        )}
+                        {item.note && (
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 italic">
+                            "{item.note}"
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openNoteDialog(item)}
+                          className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFromCart(item.id)}
+                          className="h-7 w-7 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
 
-        {/* Customer Section - Compact */}
-        <div className="p-2 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/20 dark:to-teal-950/20">
-          <CustomerSearch
-            onAddressSelect={setSelectedAddress}
-            selectedAddress={selectedAddress}
-            deliveryAreas={deliveryAreas}
-            branchId={user?.role === 'ADMIN' ? selectedBranch : user?.branchId}
-          />
-        </div>
-
-        {/* Delivery Section - Only for Delivery Orders */}
-        {orderType === 'delivery' && (
-          <div className="p-5 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-amber-50/80 to-orange-50/80 dark:from-amber-950/20 dark:to-orange-950/20">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                <Truck className="h-4 w-4 text-white" />
-              </div>
-              <h3 className="text-sm font-bold text-amber-700 dark:text-amber-400">Delivery Information</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleDecrementQuantity(item.id)}
+                          className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 p-0"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center text-[13px] font-bold text-slate-900 dark:text-white">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleIncrementQuantity(item.id)}
+                          className="h-7 w-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 p-0"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <div className="text-[13px] font-bold text-slate-900 dark:text-white">
+                        {formatCurrency(item.price * item.quantity, currency)}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <div className="space-y-3">
-              <div>
-                <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Address</Label>
-                <Textarea
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  placeholder="Enter full delivery address..."
-                  rows={2}
-                  className="text-sm mt-1.5 resize-none rounded-xl"
-                />
-              </div>
-              <div>
-                <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Area</Label>
-                <Select value={deliveryArea} onValueChange={setDeliveryArea}>
-                  <SelectTrigger className="text-sm h-10 mt-1.5 rounded-xl">
-                    <SelectValue placeholder="Select area" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {deliveryAreas.map((area) => (
-                      <SelectItem key={area.id} value={area.id}>
-                        {area.name} ({formatCurrency(area.fee, currency)})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {couriers.length > 0 && (
+          </div>
+
+          {/* Customer Search Section */}
+          <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
+            <CustomerSearch
+              onAddressSelect={setSelectedAddress}
+              selectedAddress={selectedAddress}
+              deliveryAreas={deliveryAreas}
+              branchId={user?.role === 'ADMIN' ? selectedBranch : user?.branchId}
+            />
+          </div>
+
+          {/* Delivery Section (Only for Delivery) */}
+          {orderType === 'delivery' && (
+            <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+              <div className="space-y-2">
                 <div>
-                  <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Assign Courier</Label>
-                  <Select value={selectedCourierId} onValueChange={setSelectedCourierId}>
-                    <SelectTrigger className="text-sm h-10 mt-1.5 rounded-xl">
-                      <SelectValue placeholder="Select courier (optional)" />
+                  <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Address</Label>
+                  <Textarea
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    placeholder="Enter full delivery address..."
+                    rows={2}
+                    className="text-xs mt-1 resize-none rounded-lg"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Delivery Area</Label>
+                  <Select value={deliveryArea} onValueChange={setDeliveryArea}>
+                    <SelectTrigger className="text-xs h-8 mt-1 rounded-lg">
+                      <SelectValue placeholder="Select area" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">No courier assigned</SelectItem>
-                      {couriers.map((courier: any) => (
-                        <SelectItem key={courier.id} value={courier.id}>
-                          {courier.name}
+                      {deliveryAreas.map((area) => (
+                        <SelectItem key={area.id} value={area.id}>
+                          {area.name} ({formatCurrency(area.fee, currency)})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Table Information for Dine In */}
-        {orderType === 'dine-in' && (
-          <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 dark:from-emerald-900/20 dark:to-teal-900/20">
-            {showTableGrid ? (
-              <div>
-                <div className="flex items-center justify-between mb-3">
+                {couriers.length > 0 && (
                   <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-white">Select a Table</h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">Choose a table to start ordering</p>
+                    <Label className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Assign Courier</Label>
+                    <Select value={selectedCourierId} onValueChange={setSelectedCourierId}>
+                      <SelectTrigger className="text-xs h-8 mt-1 rounded-lg">
+                        <SelectValue placeholder="Select courier (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No courier assigned</SelectItem>
+                        {couriers.map((courier: any) => (
+                          <SelectItem key={courier.id} value={courier.id}>
+                            {courier.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-                <TableGridView
-                  branchId={user?.role === 'CASHIER' ? user?.branchId : selectedBranch}
-                  onTableSelect={handleTableSelect}
-                  selectedTableId={selectedTable?.id || null}
-                />
+                )}
               </div>
-            ) : selectedTable ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                    {selectedTable.tableNumber}
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900 dark:text-white text-lg">
-                      Table {selectedTable.tableNumber}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <Badge className="bg-blue-100 text-blue-700">
-                        <Users className="h-3 w-3 mr-1" />
-                        {selectedTable.status === 'OCCUPIED' ? 'Occupied' : selectedTable.status.toLowerCase()}
-                      </Badge>
-                      {selectedTable.capacity && (
-                        <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {selectedTable.capacity} seats
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCloseTable}
-                    className="border-red-200 text-red-600 hover:bg-red-50"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Close Table
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDeselectTable}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        )}
-
-        {/* Order Summary - Compact */}
-        <div className="p-3 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900">
-          <div className="space-y-2 mb-3">
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
-              <span className="font-bold text-slate-900 dark:text-white">
-                {formatCurrency(subtotal, currency)}
-              </span>
             </div>
+          )}
 
-            {deliveryFee > 0 && (
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-600 dark:text-slate-400">Delivery</span>
+          {/* Daily Expenses (40px) */}
+          {currentShift && (
+            <div className="flex-shrink-0 h-10 px-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">Expenses</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-amber-900 dark:text-amber-100">
+                  {formatCurrency(currentDailyExpenses, currency)}
+                </span>
+                <Button
+                  onClick={() => setShowDailyExpenseDialog(true)}
+                  size="icon"
+                  variant="outline"
+                  className="h-6 w-6 p-0 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-lg"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Order Summary (100px) */}
+          <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900">
+            <div className="space-y-1.5 mb-4">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
                 <span className="font-bold text-slate-900 dark:text-white">
-                  {formatCurrency(deliveryFee, currency)}
+                  {formatCurrency(subtotal, currency)}
                 </span>
               </div>
-            )}
-            {(promoDiscount > 0 || loyaltyDiscount > 0) && (
-              <div className="flex justify-between text-xs">
-                <span className="text-orange-600 dark:text-orange-400">Discount</span>
-                <span className="font-bold text-orange-600 dark:text-orange-400">
-                  -{formatCurrency(promoDiscount + loyaltyDiscount, currency)}
+              {deliveryFee > 0 && (
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-slate-600 dark:text-slate-400">Delivery</span>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    {formatCurrency(deliveryFee, currency)}
+                  </span>
+                </div>
+              )}
+              {(promoDiscount > 0 || loyaltyDiscount > 0) && (
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-orange-600 dark:text-orange-400">Discount</span>
+                  <span className="font-bold text-orange-600 dark:text-orange-400">
+                    -{formatCurrency(promoDiscount + loyaltyDiscount, currency)}
+                  </span>
+                </div>
+              )}
+              <Separator className="bg-slate-200 dark:bg-slate-700 my-2" />
+              <div className="flex justify-between items-center">
+                <span className="text-[13px] font-bold text-slate-900 dark:text-white">Total</span>
+                <span className="text-[24px] font-black text-emerald-600 dark:text-emerald-400">
+                  {formatCurrency(total, currency)}
                 </span>
               </div>
-            )}
-            <Separator className="bg-slate-200 dark:bg-slate-700 my-2" />
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-bold text-slate-900 dark:text-white">Total</span>
-              <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(total, currency)}
-              </span>
             </div>
-          </div>
 
-          {/* Checkout Buttons - Compact */}
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+            {/* Checkout Buttons (100px) */}
+            <div className="space-y-2">
+              {/* CASH Button - BIG (48px) */}
               <Button
                 onClick={() => handleCheckout('cash')}
                 disabled={processing || currentCart.length === 0}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/30 font-bold h-8 text-xs rounded-lg transition-all"
+                className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30 font-bold text-[13px] rounded-xl transition-all active:scale-[0.98]"
               >
-                <DollarSign className="h-3.5 w-3.5 mr-1" />
-                Cash
+                <DollarSign className="h-5 w-5 mr-2" />
+                CASH
               </Button>
+
+              {/* CARD Button (40px) */}
               <Button
                 onClick={handleCardPaymentClick}
                 disabled={processing || currentCart.length === 0}
                 variant="outline"
-                className="border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold h-8 text-xs rounded-lg transition-all"
+                className="w-full h-10 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-bold text-[13px] rounded-xl transition-all active:scale-[0.98]"
               >
-                <CreditCard className="h-3.5 w-3.5 mr-1" />
-                Card
+                <CreditCard className="h-4 w-4 mr-2" />
+                CARD
+              </Button>
+
+              {/* Hold Order Button (32px) */}
+              <Button
+                onClick={handleHoldOrder}
+                disabled={processing || currentCart.length === 0}
+                variant="outline"
+                className="w-full h-8 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold text-[11px] rounded-xl transition-all active:scale-[0.98]"
+              >
+                <Pause className="h-3.5 w-3.5 mr-1.5" />
+                Hold Order
               </Button>
             </div>
-            <Button
-              onClick={handleHoldOrder}
-              disabled={processing || currentCart.length === 0}
-              variant="outline"
-              className="w-full h-8 text-xs font-semibold border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-all"
-            >
-              <Pause className="h-3.5 w-3.5 mr-1" />
-              Hold Order
-            </Button>
           </div>
         </div>
       </div>
