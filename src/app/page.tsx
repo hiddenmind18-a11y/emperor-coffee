@@ -535,9 +535,9 @@ export default function POSDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col min-h-screen">
+      <div className="relative z-10 flex flex-col h-screen overflow-hidden">
         {/* Glassmorphism Header - Mobile Responsive */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/85 backdrop-filter shadow-md">
+        <header className="flex-shrink-0 sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/85 backdrop-filter shadow-md">
         <div className="px-2 sm:px-4 py-1.5 sm:py-2">
           <div className="flex items-center justify-between gap-2">
             {/* Mobile Menu Button & Logo */}
@@ -740,8 +740,8 @@ export default function POSDashboard() {
         </div>
       </header>
 
-      {/* Main Content - Full Height, No Footer */}
-      <main className="flex-1 px-2 sm:px-4 py-2 overflow-hidden">
+      {/* Main Content Area - Full Height */}
+      <main className="flex-1 px-2 sm:px-4 py-2 overflow-hidden min-h-0">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
           <div className="flex-1 min-h-0 overflow-hidden">
             <TabsContent value="pos" className="h-full m-0 p-0">
