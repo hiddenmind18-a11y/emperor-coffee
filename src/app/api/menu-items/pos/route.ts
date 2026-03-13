@@ -83,7 +83,8 @@ export async function GET(request: NextRequest) {
               id: true,
               name: true,
               sortOrder: true,
-              imagePath: true,
+              // REMOVED: imagePath - causes 400+ MB data transfer
+              // POS interface on touch monitors doesn't need category images
             },
           },
         },

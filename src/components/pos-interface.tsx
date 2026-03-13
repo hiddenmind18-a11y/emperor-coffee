@@ -384,6 +384,9 @@ export default function POSInterface() {
   const [targetTableId, setTargetTableId] = useState<string>('');
   const [availableTables, setAvailableTables] = useState<any[]>([]);
 
+  // Settings dialog state
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+
   const { currency, t } = useI18n();
   const { data: categoriesData, loading: categoriesLoading } = useOfflineData(
     '/api/categories?active=true',
@@ -2395,7 +2398,10 @@ export default function POSInterface() {
               </span>
             </div>
           )}
-          <div className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition-all">
+          <div
+            onClick={() => setShowSettingsDialog(true)}
+            className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
+          >
             <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
           </div>
         </div>
@@ -2803,8 +2809,8 @@ export default function POSInterface() {
             </div>
           )}
 
-          {/* Order Summary (100px) */}
-          <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900">
+          {/* Order Summary (STICKY - Always Visible) */}
+          <div className="flex-shrink-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900 sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
             <div className="space-y-1.5 mb-4">
               <div className="flex justify-between text-[11px]">
                 <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
@@ -4201,6 +4207,120 @@ export default function POSInterface() {
             >
               <ArrowRight className="h-4 w-4 mr-2" />
               Transfer Items
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
+        <DialogContent className="sm:max-w-md rounded-3xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Settings className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold">Settings</DialogTitle>
+                <DialogDescription>Account and system information</DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            {/* User Information */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <p className="font-bold text-slate-900 dark:text-white">{user?.username || 'Unknown'}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role || 'User'}</p>
+                </div>
+              </div>
+              <div className="space-y-1 text-xs">
+                {user?.email && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Email</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{user.email}</span>
+                  </div>
+                )}
+                {user?.branchId && user?.role === 'CASHIER' && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Branch ID</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{user.branchId}</span>
+                  </div>
+                )}
+                {currentShift && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Shift Status</span>
+                    <span className="font-medium text-emerald-600 dark:text-emerald-400">Open</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Shift Information (if cashier has shift open) */}
+            {currentShift && (
+              <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <p className="font-bold text-emerald-900 dark:text-emerald-100 text-sm">Current Shift</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <p className="text-emerald-700 dark:text-emerald-400">Orders</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">{currentShift.orderCount || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-emerald-700 dark:text-emerald-400">Revenue</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">{formatCurrency(currentShift.currentRevenue || 0, currency)}</p>
+                  </div>
+                  <div>
+                    <p className="text-emerald-700 dark:text-emerald-400">Cash</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">{formatCurrency(currentShift.cashCollected || 0, currency)}</p>
+                  </div>
+                  <div>
+                    <p className="text-emerald-700 dark:text-emerald-400">Card</p>
+                    <p className="font-bold text-emerald-900 dark:text-emerald-100 text-lg">{formatCurrency(currentShift.cardCollected || 0, currency)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Daily Expenses Quick Access */}
+            {currentShift && (
+              <Button
+                onClick={() => {
+                  setShowSettingsDialog(false);
+                  setShowDailyExpenseDialog(true);
+                }}
+                variant="outline"
+                className="w-full h-11 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 rounded-xl font-semibold"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Add Daily Expense
+              </Button>
+            )}
+          </div>
+          <DialogFooter className="pt-4 border-t">
+            <Button
+              onClick={() => setShowSettingsDialog(false)}
+              variant="outline"
+              className="flex-1 rounded-xl h-11 font-semibold"
+            >
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+              }}
+              className="flex-1 rounded-xl h-11 font-semibold bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg shadow-red-500/30 text-white"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Logout
             </Button>
           </DialogFooter>
         </DialogContent>
