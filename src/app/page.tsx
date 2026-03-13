@@ -537,8 +537,8 @@ export default function POSDashboard() {
       {/* Main Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Glassmorphism Header - Mobile Responsive */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/80/80 backdrop-filter blur(20px) border-b border-slate-200/200 shadow-2xl">
-        <div className="px-2 sm:px-4 py-2 sm:py-4">
+        <header className="sticky top-0 z-50 backdrop-blur-xl backdrop-saturate-150 bg-white/80/80 backdrop-filter blur(20px)  shadow-2xl">
+        <div className="px-2 sm:px-4 py-1.5 sm:py-2">
           <div className="flex items-center justify-between gap-2">
             {/* Mobile Menu Button & Logo */}
             <div className="flex items-center gap-2 sm:gap-6">
@@ -721,28 +721,6 @@ export default function POSDashboard() {
       {/* Main Content - Full Height, No Footer */}
       <main className="flex-1 px-2 sm:px-4 py-2">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-          {/* Compact Navigation Dropdown - Desktop */}
-          <div className="hidden lg:block mb-3 flex-shrink-0">
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full h-9 bg-white/60 backdrop-blur-md border-slate-200 rounded-xl shadow-xl font-bold text-emerald-700">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {navigationItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <SelectItem key={item.id} value={item.id}>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
-                        <span>{item.label}</span>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="flex-1 min-h-0">
             <TabsContent value="pos" className="h-full m-0 p-0">
               {canAccessPOS ? (

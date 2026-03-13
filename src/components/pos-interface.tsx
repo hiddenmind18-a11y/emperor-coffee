@@ -2336,93 +2336,7 @@ export default function POSInterface() {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
-      {/* COMPACT HEADER (36px) */}
-      <div className="flex-shrink-0 h-9 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-3">
-        {/* Logo/Brand */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
-            <Store className="h-3.5 w-3.5 text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <h1 className="font-bold text-sm text-slate-900 dark:text-white leading-none">Emperor POS</h1>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="flex-1 max-w-xl relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
-          <Input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 pr-7 h-7 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 hover:text-slate-600"
-            >
-              <X className="h-2.5 w-2.5" />
-            </Button>
-          )}
-        </div>
-
-        {/* Branch Selector (Admin Only) */}
-        {user?.role === 'ADMIN' && (
-          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-24 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
-              <SelectValue placeholder="Branch" />
-            </SelectTrigger>
-            <SelectContent>
-              {branches.map((branch) => (
-                <SelectItem key={branch.id} value={branch.id}>
-                  {branch.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {/* Daily Expenses Button (Compact) */}
-        {currentShift && (
-          <Button
-            onClick={() => setShowDailyExpenseDialog(true)}
-            variant="outline"
-            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
-          >
-            <TrendingUp className="h-3 w-3" />
-            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
-          </Button>
-        )}
-
-        {/* User & Settings */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          {lowStockAlerts.length > 0 && (
-            <div className="relative group">
-              <div
-                onClick={() => setShowLowStockDialog(true)}
-                className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:scale-105 transition-all"
-              >
-                <AlertTriangle className="h-3.5 w-3.5 text-white" />
-              </div>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {lowStockAlerts.length}
-              </span>
-            </div>
-          )}
-          <div
-            onClick={() => setShowSettingsDialog(true)}
-            className="w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
-          >
-            <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
-          </div>
-        </div>
-      </div>
-
-      {/* HORIZONTAL CATEGORY TABS (40px) - RESTORED */}
+      {/* HORIZONTAL CATEGORY TABS (40px) */}
       <div className="flex-shrink-0 h-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
         <div className="flex items-center h-full gap-1 px-2">
           {allCategories.map((category) => {
@@ -2456,6 +2370,82 @@ export default function POSInterface() {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* TOOLBAR (32px) - Search, Alerts, Settings, Expenses, Branch */}
+      <div className="flex-shrink-0 h-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-2 gap-2">
+        {/* Search Bar */}
+        <div className="flex-1 max-w-sm relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+          <Input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-7 pr-6 h-7 bg-slate-100 dark:bg-slate-800 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 hover:text-slate-600"
+            >
+              <X className="h-2.5 w-2.5" />
+            </Button>
+          )}
+        </div>
+
+        {/* Branch Selector (Admin Only) */}
+        {user?.role === 'ADMIN' && (
+          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+            <SelectTrigger className="w-20 h-7 bg-slate-100 dark:bg-slate-800 border-0 text-xs">
+              <SelectValue placeholder="Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              {branches.map((branch) => (
+                <SelectItem key={branch.id} value={branch.id}>
+                  {branch.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Daily Expenses */}
+        {currentShift && (
+          <Button
+            onClick={() => setShowDailyExpenseDialog(true)}
+            variant="outline"
+            className="h-7 px-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/50 text-[10px] font-bold rounded-lg gap-1"
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="font-black">{formatCurrency(currentDailyExpenses, currency)}</span>
+          </Button>
+        )}
+
+        {/* Alerts */}
+        {lowStockAlerts.length > 0 && (
+          <div className="relative group">
+            <div
+              onClick={() => setShowLowStockDialog(true)}
+              className="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:scale-105 transition-all"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 text-white" />
+            </div>
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              {lowStockAlerts.length}
+            </span>
+          </div>
+        )}
+
+        {/* Settings */}
+        <div
+          onClick={() => setShowSettingsDialog(true)}
+          className="w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg hover:from-slate-200 hover:to-slate-300 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all"
+        >
+          <Settings className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
         </div>
       </div>
 
@@ -2587,22 +2577,13 @@ export default function POSInterface() {
                       {/* Content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center p-3 pt-5">
                         {/* Product Name */}
-                        <h3 className="text-[13px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-2">
+                        <h3 className="text-[14px] font-bold text-slate-900 dark:text-white text-center leading-tight line-clamp-2 mb-3">
                           {item.name}
                         </h3>
 
-                        {/* Variants Badge */}
-                        {item.hasVariants && (
-                          <div className="mb-2">
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${categoryColor} text-white`}>
-                              {item.variants?.length || 0} variants
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Price */}
-                        <div className={`text-[18px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
-                          {formatCurrency(item.price, currency)}
+                        {/* Price - NO EGP, just the number */}
+                        <div className={`text-[24px] font-black bg-gradient-to-r ${categoryColor} bg-clip-text text-transparent`}>
+                          {item.price.toFixed(2)}
                         </div>
                       </div>
 
