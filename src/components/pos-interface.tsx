@@ -394,7 +394,7 @@ export default function POSInterface() {
   );
 
   const { data: menuItemsData, loading: menuItemsLoading, refetch: refetchMenuItems } = useOfflineData(
-    `/api/menu-items?active=true&includeVariants=true&branchId=${user?.role === 'ADMIN' ? selectedBranch : (user?.branchId || '')}`,
+    `/api/menu-items/pos?branchId=${user?.role === 'ADMIN' ? selectedBranch : (user?.branchId || '')}`,
     {
       fetchFromDB: offlineDataFetchers.menuItems,
       deps: [selectedBranch, user?.branchId, user?.role],
