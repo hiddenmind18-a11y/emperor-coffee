@@ -2374,9 +2374,9 @@ export default function POSInterface() {
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left: Product Grid */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Order Type & Actions Bar (28px) - MORE COMPACT */}
           <div className="flex-shrink-0 h-7 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-3 gap-2">
             {/* Order Type Selector */}
@@ -2455,9 +2455,9 @@ export default function POSInterface() {
             )}
           </div>
 
-          {/* Table Grid Overlay (Dine In) */}
+          {/* Table Grid Overlay (Dine In) - Scrollable independently */}
           {orderType === 'dine-in' && showTableGrid && (
-            <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900/50">
               <TableGridView
                 branchId={user?.role === 'CASHIER' ? user?.branchId : selectedBranch}
                 onTableSelect={handleTableSelect}
@@ -2466,8 +2466,8 @@ export default function POSInterface() {
             </div>
           )}
 
-          {/* Product Grid */}
-          <div className={`flex-1 overflow-y-auto p-4 ${orderType === 'dine-in' && showTableGrid ? 'hidden' : ''}`}>
+          {/* Product Grid - Scrollable independently */}
+          <div className={`flex-1 min-h-0 overflow-y-auto p-4 ${orderType === 'dine-in' && showTableGrid ? 'hidden' : ''}`}>
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
@@ -2524,7 +2524,7 @@ export default function POSInterface() {
         </div>
 
         {/* Right: Compact Cart Sidebar (300px) - SHOW ON LG (1024px+) */}
-        <div className="hidden lg:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="hidden lg:flex flex-col w-[300px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
           {/* Cart Header (36px) - More compact */}
           <div className="flex-shrink-0 h-[36px] px-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
             <div className="flex items-center gap-2">
