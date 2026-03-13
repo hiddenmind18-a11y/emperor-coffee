@@ -46,6 +46,37 @@ export async function GET(request: NextRequest) {
           sortOrder: true,
           // REMOVED: imagePath - base64 images cause massive data transfer (4.22 GB!)
           // POS doesn't need images embedded in JSON - they should be loaded as separate URLs
+          // Include variants with essential data (variant type, option, price modifier)
+          variants: {
+            select: {
+              id: true,
+              priceModifier: true,
+              sortOrder: true,
+              isActive: true,
+              variantOption: {
+                select: {
+                  id: true,
+                  name: true,
+                  sortOrder: true,
+                  isActive: true,
+                  variantType: {
+                    select: {
+                      id: true,
+                      name: true,
+                      isCustomInput: true,
+                      isActive: true,
+                    },
+                  },
+                },
+              },
+            },
+            where: {
+              isActive: true,
+            },
+            orderBy: [
+              { sortOrder: 'asc' },
+            ],
+          },
           categoryRel: {
             select: {
               id: true,
