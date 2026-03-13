@@ -81,8 +81,9 @@ export const db = (() => {
     },
   })
 
-  // Extend with Accelerate if using Data Proxy or Accelerate URL
-  const extendedClient = (isDataProxy || isAccelerate)
+  // Extend with Accelerate ONLY when using Data Proxy format (prisma+postgres://)
+  // Note: prisma:// URLs already have Accelerate built-in, no extension needed
+  const extendedClient = isDataProxy
     ? prismaClient.$extends(withAccelerate())
     : prismaClient
 
