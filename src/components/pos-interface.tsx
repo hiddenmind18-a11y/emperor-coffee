@@ -2327,8 +2327,8 @@ export default function POSInterface() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* Mobile Categories - Horizontal Scroll Bar */}
-      <div className="md:hidden flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 px-4 py-3">
-        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+      <div className="md:hidden flex-shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 px-2 py-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
           {allCategories.map((category) => {
             const isActive = selectedCategory === category.id;
             const categoryColor = getCategoryColor(category.name);
@@ -2339,27 +2339,12 @@ export default function POSInterface() {
                   setSelectedCategory(category.id);
                   setSearchQuery('');
                 }}
-                className={`flex-shrink-0 flex items-center gap-2 px-4 h-14 rounded-2xl text-xs font-bold transition-all duration-300 border ${
+                className={`flex-shrink-0 flex items-center gap-1.5 px-2 h-10 rounded-xl text-[10px] font-bold transition-all duration-300 border ${
                   isActive
-                    ? `bg-gradient-to-r shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-500/50 ${categoryColor} text-white`
+                    ? `bg-gradient-to-r shadow-md shadow-emerald-500/30 ring-1 ring-emerald-500/50 ${categoryColor} text-white`
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
-                {/* Category Image or Icon on Mobile */}
-                <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white/20">
-                  {category.imagePath ? (
-                    <img
-                      src={category.imagePath}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <Coffee className="w-5 h-5" />
-                  )}
-                </div>
                 <span className="whitespace-nowrap">{category.name}</span>
               </button>
             );
@@ -2369,32 +2354,32 @@ export default function POSInterface() {
 
       {/* Left Sidebar - Modern Categories (Desktop) */}
       {categoriesExpanded && (
-        <div className="hidden md:flex flex-col w-72 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0 h-full overflow-hidden">
-          {/* Logo/Brand Section */}
-          <div className="flex-shrink-0 p-6 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-500/20">
-                <Store className="h-6 w-6 text-white" />
+        <div className="hidden md:flex flex-col w-56 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0 h-full overflow-hidden">
+          {/* Logo/Brand Section - Compact */}
+          <div className="flex-shrink-0 p-3 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/30">
+                <Store className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">Emperor</h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase">POS System</p>
+                <h1 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight">Emperor</h1>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase">POS</p>
               </div>
             </div>
           </div>
 
-          {/* Categories Section */}
+          {/* Categories Section - Compact */}
           <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-            <div className="flex-shrink-0 px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/30">
-              <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <div className="flex-shrink-0 px-3 py-2 border-b border-slate-200/50 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/30">
+              <h2 className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
                 <Filter className="h-3 w-3" />
                 Categories
               </h2>
             </div>
 
             <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-full px-4 py-4">
-                <div className="space-y-2">
+              <ScrollArea className="h-full px-2 py-2">
+                <div className="space-y-1">
                   {allCategories.map((category) => {
                     const isActive = selectedCategory === category.id;
                     return (
@@ -2404,54 +2389,37 @@ export default function POSInterface() {
                           setSelectedCategory(category.id);
                           setSearchQuery('');
                         }}
-                        className={`w-full group relative overflow-hidden rounded-2xl p-0 text-left transition-all duration-300 ${
+                        className={`w-full group relative overflow-hidden rounded-xl p-0 text-left transition-all duration-300 ${
                           isActive
-                            ? 'bg-gradient-to-r shadow-lg shadow-emerald-500/20 ring-1 ring-emerald-500/30'
+                            ? 'bg-gradient-to-r shadow-md shadow-emerald-500/20 ring-1 ring-emerald-500/30'
                             : 'hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                         }`}
                         style={isActive ? { background: `linear-gradient(to right, var(--tw-gradient-stops))`, '--tw-gradient-from': `var(--color-${category.color.split('-')[0]}-500)`, '--tw-gradient-to': `var(--color-${category.color.split('-')[2]}-600)` } as React.CSSProperties : {}}
                       >
                         <div className={`bg-gradient-to-r ${category.color} absolute inset-0 opacity-0 ${isActive ? 'opacity-100' : ''} transition-opacity duration-300`} />
 
-                        <div className="relative flex items-center gap-4 p-4">
-                          {/* Category Image or Fallback Icon - Premium Look */}
-                          <div className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-800'}`}>
-                            {category.imagePath ? (
-                              <img
-                                src={category.imagePath}
-                                alt={category.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                  (e.currentTarget as HTMLElement).innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="coffee-icon"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>';
-                                }}
-                              />
-                            ) : (
-                              <Coffee className={`w-8 h-8 ${isActive ? 'text-white/80' : 'text-slate-400'}`} />
-                            )}
-                          </div>
-
+                        <div className="relative flex items-center gap-2 p-2">
                           <div className="flex-1 min-w-0">
-                            <span className={`font-bold text-base block truncate transition-colors ${
+                            <span className={`font-bold text-xs block truncate transition-colors ${
                               isActive ? 'text-white' : 'text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
                             }`}>
                               {category.name}
                             </span>
                             {category.id !== 'all' && (
-                              <span className={`text-xs mt-1 block font-medium transition-colors ${
+                              <span className={`text-[10px] mt-0.5 block font-medium transition-colors ${
                                 isActive ? 'text-white/80' : 'text-slate-400 dark:text-slate-500'
                               }`}>
-                                {menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length} items
+                                {menuItems.filter(m => m.categoryId === category.id || m.category === categories.find(c => c.id === category.id)?.name).length}
                               </span>
                             )}
                           </div>
 
                           {isActive ? (
-                            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
-                              <CheckCircle className="h-5 w-5 text-white" />
+                            <div className="w-5 h-5 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
+                              <CheckCircle className="h-3 w-3 text-white" />
                             </div>
                           ) : (
-                            <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors flex-shrink-0" />
+                            <ChevronRight className="h-3 w-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors flex-shrink-0" />
                           )}
                         </div>
                       </button>
@@ -2462,18 +2430,15 @@ export default function POSInterface() {
             </div>
           </div>
 
-          {/* Low Stock Alert */}
+          {/* Low Stock Alert - Compact */}
           {lowStockAlerts.length > 0 && (
-            <div className="flex-shrink-0 p-4 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/30">
-                  <AlertTriangle className="h-4 w-4 text-white" />
+            <div className="flex-shrink-0 p-2 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
+              <div className="flex items-start gap-2">
+                <div className="w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-amber-500/30">
+                  <AlertTriangle className="h-3 w-3 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-0.5">Low Stock Alert</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-500">
-                    {lowStockAlerts.length} {lowStockAlerts.length === 1 ? 'item' : 'items'} running low
-                  </p>
+                  <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400">{lowStockAlerts.length} low</p>
                 </div>
               </div>
             </div>
@@ -2483,50 +2448,50 @@ export default function POSInterface() {
 
       {/* Center - Menu Items */}
       <div className="flex-1 flex flex-col min-w-0 relative">
-        {/* Modern Top Bar */}
-        <div className="flex-shrink-0 px-4 md:px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-          <div className="flex items-center gap-4">
-            {/* Sidebar Toggle Button */}
+        {/* Compact Top Bar */}
+        <div className="flex-shrink-0 px-3 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+          <div className="flex items-center gap-2">
+            {/* Sidebar Toggle Button - Compact */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="hidden md:flex h-11 w-11 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50"
+              className="hidden md:flex h-8 w-8 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50"
               title={categoriesExpanded ? 'Hide Sidebar' : 'Show Sidebar'}
             >
               {categoriesExpanded ? (
-                <PanelLeftClose className="h-4 w-4" />
+                <PanelLeftClose className="h-3.5 w-3.5" />
               ) : (
-                <PanelLeftOpen className="h-4 w-4" />
+                <PanelLeftOpen className="h-3.5 w-3.5" />
               )}
             </Button>
 
-            {/* Collapsible Search Toggle */}
+            {/* Collapsible Search Toggle - Compact */}
             {!searchExpanded ? (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSearchExpanded(true)}
-                className="h-11 w-11 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50 relative"
+                className="h-8 w-8 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 border border-slate-200/50 dark:border-slate-700/50 relative"
                 title="Search products"
               >
-                <Search className="h-4 w-4" />
+                <Search className="h-3.5 w-3.5" />
                 {searchQuery && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white">●</span>
+                  <span className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-white">●</span>
                   </span>
                 )}
               </Button>
             ) : (
-              <div className="flex-1 max-w-md relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-hover:text-emerald-500 transition-colors z-10" />
+              <div className="flex-1 max-w-xs relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-500 transition-colors z-10" />
                 <Input
                   type="text"
-                  placeholder="Search products, categories..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-11 pr-12 h-12 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-xl transition-all relative z-0"
+                  className="pl-9 pr-8 h-8 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs transition-all relative z-0"
                   autoFocus
                 />
                 <Button
@@ -2536,19 +2501,19 @@ export default function POSInterface() {
                     setSearchExpanded(false);
                     setSearchQuery('');
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
             )}
 
-            {/* Modern Order Type Buttons (Desktop) */}
-            <div className="hidden md:flex items-center gap-3">
+            {/* Compact Order Type Buttons (Desktop) */}
+            <div className="hidden md:flex items-center gap-2">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
                 const configs = {
                   'dine-in': {
-                    icon: <Utensils className="h-5 w-5" />,
+                    icon: <Utensils className="h-4 w-4" />,
                     label: 'Dine In',
                     gradient: 'from-purple-500 to-violet-600',
                     bg: 'bg-purple-50 dark:bg-purple-950/30',
@@ -2556,7 +2521,7 @@ export default function POSInterface() {
                     text: 'text-purple-600 dark:text-purple-400',
                   },
                   'take-away': {
-                    icon: <Package className="h-5 w-5" />,
+                    icon: <Package className="h-4 w-4" />,
                     label: 'Take Away',
                     gradient: 'from-amber-500 to-orange-600',
                     bg: 'bg-amber-50 dark:bg-amber-950/30',
@@ -2564,7 +2529,7 @@ export default function POSInterface() {
                     text: 'text-amber-600 dark:text-amber-400',
                   },
                   'delivery': {
-                    icon: <Truck className="h-5 w-5" />,
+                    icon: <Truck className="h-4 w-4" />,
                     label: 'Delivery',
                     gradient: 'from-blue-500 to-cyan-600',
                     bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -2579,39 +2544,39 @@ export default function POSInterface() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-lg min-w-[140px] ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md ${
                       isActive
-                        ? `bg-gradient-to-r ${config.gradient} text-white shadow-lg shadow-${config.gradient.split('-')[1]}-500/30 transform scale-105`
-                        : `${config.bg} ${config.border} ${config.text} hover:scale-102 hover:shadow-md`
+                        ? `bg-gradient-to-r ${config.gradient} text-white shadow-md`
+                        : `${config.bg} ${config.border} ${config.text} hover:shadow-sm`
                     }`}
                     aria-label={`Switch to ${config.label}`}
                     aria-pressed={isActive}
                   >
-                    <span className={`flex items-center justify-center w-8 h-8 rounded-xl ${
+                    <span className={`flex items-center justify-center w-6 h-6 rounded-lg ${
                       isActive ? 'bg-white/20' : 'bg-white/50 dark:bg-white/10'
                     }`}>
                       {config.icon}
                     </span>
-                    <span>{config.label}</span>
+                    <span className="whitespace-nowrap">{config.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Mobile Order Type Selector */}
-            <div className="md:hidden flex items-center gap-2">
+            {/* Mobile Order Type Selector - Compact */}
+            <div className="md:hidden flex items-center gap-1">
               {(['take-away', 'dine-in', 'delivery'] as const).map((type) => {
                 const configs = {
                   'dine-in': {
-                    icon: <Utensils className="h-4 w-4" />,
+                    icon: <Utensils className="h-3.5 w-3.5" />,
                     gradient: 'from-purple-500 to-violet-600',
                   },
                   'take-away': {
-                    icon: <Package className="h-4 w-4" />,
+                    icon: <Package className="h-3.5 w-3.5" />,
                     gradient: 'from-amber-500 to-orange-600',
                   },
                   'delivery': {
-                    icon: <Truck className="h-4 w-4" />,
+                    icon: <Truck className="h-3.5 w-3.5" />,
                     gradient: 'from-blue-500 to-cyan-600',
                   },
                 };
@@ -2622,32 +2587,32 @@ export default function POSInterface() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 ${
+                    className={`flex flex-col items-center justify-center p-1.5 rounded-lg transition-all duration-300 ${
                       isActive
-                        ? `bg-gradient-to-br ${config.gradient} text-white shadow-lg`
+                        ? `bg-gradient-to-br ${config.gradient} text-white shadow-md`
                         : 'bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50'
                     }`}
                     aria-label={`Switch to ${type}`}
                     aria-pressed={isActive}
                   >
-                    <span className="flex items-center justify-center w-8 h-8 rounded-lg">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-md">
                       {config.icon}
                     </span>
-                    <span className="text-[10px] font-bold mt-1">
-                      {type === 'dine-in' && 'Dine In'}
-                      {type === 'take-away' && 'Take Away'}
-                      {type === 'delivery' && 'Delivery'}
+                    <span className="text-[8px] font-bold mt-0.5 leading-tight">
+                      {type === 'dine-in' && 'Dine'}
+                      {type === 'take-away' && 'Away'}
+                      {type === 'delivery' && 'Deliv'}
                     </span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Branch Selector for Admin */}
+            {/* Branch Selector for Admin - Compact */}
             {user?.role === 'ADMIN' && (
               <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-                <SelectTrigger className="w-44 h-12 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-xl">
-                  <SelectValue placeholder="Select Branch" />
+                <SelectTrigger className="w-32 h-8 bg-slate-100/80 dark:bg-slate-800/80 border-0 focus:ring-2 focus:ring-emerald-500/50 rounded-lg text-xs">
+                  <SelectValue placeholder="Branch" />
                 </SelectTrigger>
                 <SelectContent>
                   {branches.map((branch) => (
@@ -2661,116 +2626,73 @@ export default function POSInterface() {
           </div>
         </div>
 
-        {/* Modern Products Grid */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6">
+        {/* Compact Products Grid */}
+        <div className="flex-1 overflow-y-auto p-2 pb-2">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="relative">
-                  <div className="animate-spin h-12 w-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full mx-auto mb-4" />
-                  <div className="absolute inset-0 animate-pulse bg-emerald-500/10 rounded-full" />
-                </div>
-                <p className="text-slate-600 dark:text-slate-400 font-medium">Loading menu...</p>
+                <div className="animate-spin h-8 w-8 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full mx-auto mb-2" />
+                <p className="text-xs text-slate-600 dark:text-slate-400">Loading...</p>
               </div>
             </div>
           ) : filteredMenuItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-slate-400">
-              <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-4">
-                <Search className="h-10 w-10 opacity-40" />
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mb-2">
+                <Search className="h-6 w-6 opacity-40" />
               </div>
-              <p className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-1">No products found</p>
-              <p className="text-sm">Try adjusting your search or category filter</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">No products</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {filteredMenuItems.map((item) => {
                 const categoryColor = getCategoryColor(item.category);
-                // Find the category for this item to get its image as fallback
-                const itemCategory = categories.find(c => c.id === item.categoryId || c.name === item.category);
-                const fallbackCategoryImage = itemCategory?.imagePath;
-                const displayImage = item.imagePath || fallbackCategoryImage;
 
                 return (
                   <Card
                     key={item.id}
                     onClick={() => handleItemClick(item)}
-                    className="group cursor-pointer border-0 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 transform hover:-translate-y-2"
+                    className="group cursor-pointer border-0 bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-0.5"
                   >
-                    {/* Premium Product Card with Full-Bleed Image */}
-                    <div className="aspect-[4/5] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
-                      {/* Menu Item Image - Full Bleed (with category fallback) */}
-                      {displayImage ? (
-                        <img
-                          src={displayImage}
-                          alt={item.name}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <>
-                          {/* Animated Gradient Background */}
-                          <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-5 group-hover:opacity-10 transition-all duration-500`} />
-                          
-                          {/* Decorative Pattern */}
-                          <div className="absolute inset-0 opacity-5">
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-4 border-slate-300 dark:border-slate-600 rounded-full" />
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-slate-300 dark:border-slate-600 rounded-full" />
-                          </div>
+                    {/* Compact Product Card - No Images */}
+                    <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
+                      {/* Gradient Background */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${categoryColor} opacity-10 group-hover:opacity-20 transition-all duration-300`} />
 
-                          {/* Fallback Icon */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Coffee className="w-20 h-20 text-slate-200 dark:text-slate-700 group-hover:scale-110 transition-transform duration-500" />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Gradient Overlay for Better Text Readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-
-                      {/* Category Tag - Top Left */}
-                      <div className="absolute top-3 left-3">
-                        <Badge 
-                          variant="secondary" 
-                          className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md text-xs font-bold px-3 py-1.5 rounded-full shadow-lg border border-white/20"
-                        >
-                          {item.category}
-                        </Badge>
-                      </div>
+                      {/* Gradient Overlay for Text Readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
 
                       {/* Variants Badge - Top Right */}
                       {item.hasVariants && (
-                        <div className="absolute top-3 right-3">
-                          <div className={`bg-gradient-to-br ${categoryColor} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5`}>
-                            <Layers className="h-3 w-3" />
+                        <div className="absolute top-1.5 right-1.5">
+                          <div className={`bg-gradient-to-br ${categoryColor} text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5`}>
+                            <Layers className="h-2 w-2" />
                             <span>{item.variants?.length || 0}</span>
                           </div>
                         </div>
                       )}
 
                       {/* Product Info Overlay - Bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 pt-12">
+                      <div className="absolute bottom-0 left-0 right-0 p-2 pt-4">
                         {/* Product Name */}
-                        <h3 className="font-bold text-lg text-white leading-tight line-clamp-2 mb-2 drop-shadow-lg">
+                        <h3 className="font-bold text-xs text-white leading-tight line-clamp-2 mb-1 drop-shadow">
                           {item.name}
                         </h3>
                         
-                        {/* Price and Add Button */}
+                        {/* Price */}
                         <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-white drop-shadow-lg">
+                          <span className="text-sm font-bold text-white drop-shadow">
                             {formatCurrency(item.price, currency)}
                           </span>
                           
                           {/* Quick Add Button */}
-                          <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${categoryColor} flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-all duration-300`}>
-                            <Plus className="h-6 w-6 text-white" />
+                          <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${categoryColor} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300`}>
+                            <Plus className="h-3 w-3 text-white" />
                           </div>
                         </div>
                       </div>
 
-                      {/* Hover Effect - Full Screen Overlay */}
-                      <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-all duration-500" />
+                      {/* Hover Effect */}
+                      <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-all duration-300" />
                     </div>
                   </Card>
                 );
@@ -2780,190 +2702,124 @@ export default function POSInterface() {
         </div>
       </div>
 
-      {/* Right Sidebar - Cart (Desktop) */}
-      <div className="hidden lg:flex flex-col h-full w-[440px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-l border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0">
-        {/* Cart Header */}
-        <div className="p-6 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-850/50">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                <ShoppingCart className="h-5 w-5 text-white" />
+      {/* Right Sidebar - Cart (Desktop) - Compact */}
+      <div className="hidden lg:flex flex-col h-full w-[320px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-l border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex-shrink-0">
+        {/* Cart Header - Compact */}
+        <div className="p-3 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-850/50">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/30">
+                <ShoppingCart className="h-3.5 w-3.5 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Current Order</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Order</h2>
             </div>
-            <Badge variant="outline" className="bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold px-3 py-1.5 rounded-full">
-              {totalItems} {totalItems === 1 ? 'item' : 'items'}
+            <Badge variant="outline" className="bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 font-semibold px-2 py-0.5 rounded-full text-[10px]">
+              {totalItems}
             </Badge>
           </div>
-          {lastOrderNumber > 0 && (
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 ml-13">
-              <Receipt className="h-3 w-3" />
-              Last Order: <span className="font-semibold text-slate-700 dark:text-slate-300">#{lastOrderNumber}</span>
-            </div>
-          )}
-          {/* Daily Expenses Section */}
-          {currentShift && (
-            <div className="mt-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 rounded-xl border border-amber-200 dark:border-amber-800">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Wallet className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                  <div>
-                    <p className="text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">Daily Expenses</p>
-                    <p className="text-sm font-bold text-amber-800 dark:text-amber-200">
-                      {formatCurrency(currentDailyExpenses, currency)}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => setShowDailyExpenseDialog(true)}
-                  size="sm"
-                  variant="outline"
-                  className="h-8 text-xs text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                >
-                  <DollarSign className="h-3 w-3 mr-1" />
-                  Add
-                </Button>
-              </div>
-            </div>
-          )}
-          {/* Held Orders Button */}
-          <div className="mt-2 flex gap-2">
+          {/* Held Orders Button - Compact */}
+          <div className="mt-2 flex gap-1">
             {orderType === 'dine-in' && selectedTable && tableCart.length > 0 && (
               <Button
                 onClick={handleOpenTransferDialog}
                 size="sm"
                 variant="outline"
-                className="flex-1 h-9 text-xs border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50"
+                className="flex-1 h-7 text-[10px] border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50"
               >
-                <ArrowRight className="h-3.5 w-3.5 mr-2" />
-                Transfer Items
+                <ArrowRight className="h-3 w-3 mr-1" />
+                Transfer
               </Button>
             )}
             <Button
               onClick={() => setShowHeldOrdersDialog(true)}
               size="sm"
               variant="outline"
-              className={`h-9 text-xs border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 ${orderType === 'dine-in' && selectedTable && tableCart.length > 0 ? 'flex-1' : 'flex-1'}`}
+              className={`flex-1 h-7 text-[10px] border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 ${orderType === 'dine-in' && selectedTable && tableCart.length > 0 ? '' : 'flex-1'}`}
             >
-              <Clock className="h-3.5 w-3.5 mr-2" />
-              Held Orders
-              {heldOrders.length > 0 && (
-                <Badge className="ml-2 h-5 min-w-[20px] px-1.5 flex items-center justify-center bg-indigo-600 text-white text-[10px] font-bold">
-                  {heldOrders.length}
-                </Badge>
-              )}
+              <Clock className="h-3 w-3 mr-1" />
+              Held {heldOrders.length > 0 && `(${heldOrders.length})`}
             </Button>
           </div>
         </div>
 
-        {/* Cart Items */}
+        {/* Cart Items - Compact */}
         <div className="flex-1 min-h-0 overflow-hidden">
-          <ScrollArea className="h-full p-4">
+          <ScrollArea className="h-full p-2">
             {currentCart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8">
-                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-4">
-                  <ShoppingCart className="h-10 w-10 opacity-40" />
+              <div className="flex flex-col items-center justify-center h-full text-slate-400 p-4">
+                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center mb-2">
+                  <ShoppingCart className="h-6 w-6 opacity-40" />
                 </div>
-                <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">Cart is empty</p>
-                <p className="text-xs">Add items to start order</p>
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Empty</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {currentCart.map((item) => (
                 <div
                   key={item.id}
-                  className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-850 rounded-2xl p-4 border border-slate-200/50 dark:border-slate-700/50 hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300"
+                  className="group bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-850 rounded-xl p-2 border border-slate-200/50 dark:border-slate-700/50 hover:border-emerald-300 dark:hover:border-emerald-700/50 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-300"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1 min-w-0 pr-3">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
-                          {item.name}
-                        </h4>
-                        {item.note && (
-                          <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400" title={item.note}>
-                            <MessageSquare className="h-3.5 w-3.5 flex-shrink-0" />
-                          </div>
-                        )}
-                      </div>
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                        {item.name}
+                      </h4>
                       {item.variantName && (
-                        <div className="inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-2 py-1 rounded-lg mb-1.5">
-                          <Layers className="h-3 w-3" />
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5">
                           {item.variantName}
                         </div>
                       )}
                       {item.note && (
-                        <div className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 italic">
+                        <div className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 italic">
                           "{item.note}"
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 flex-shrink-0 rounded-xl transition-all"
+                        className="h-6 w-6 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 flex-shrink-0 rounded-lg"
                         onClick={() => openNoteDialog(item)}
-                        title="Edit note or quantity"
                       >
-                        <Edit3 className="h-4 w-4" />
+                        <Edit3 className="h-3 w-3" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 flex-shrink-0 rounded-xl transition-all"
+                        className="h-6 w-6 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 flex-shrink-0 rounded-lg"
                         onClick={() => removeFromCart(item.id)}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-9 w-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all"
+                        className="h-6 w-6 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-xs"
                         onClick={() => handleDecrementQuantity(item.id)}
                       >
-                        <Minus className="h-3.5 w-3.5" />
+                        <Minus className="h-3 w-3" />
                       </Button>
-                      <Input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={item.quantity}
-                        onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                        className="w-16 h-9 text-center font-bold text-lg text-slate-900 dark:text-white border-slate-200 dark:border-slate-700"
-                      />
+                      <span className="w-8 text-center font-bold text-xs text-slate-900 dark:text-white">
+                        {item.quantity}
+                      </span>
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-9 w-9 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/50 hover:text-emerald-600 dark:hover:text-emerald-400 border-slate-200 dark:border-slate-700 transition-all"
-                        onClick={() => openNumberPad(
-                          (value) => handleQuantityChange(item.id, value),
-                          item.quantity.toString()
-                        )}
-                        title="Open Number Pad"
-                      >
-                        <Calculator className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all"
+                        className="h-6 w-6 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-xs"
                         onClick={() => handleIncrementQuantity(item.id)}
                       >
-                        <Plus className="h-3.5 w-3.5" />
+                        <Plus className="h-3 w-3" />
                       </Button>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                      <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                         {formatCurrency(item.price * item.quantity, currency)}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                        {formatCurrency(item.price, currency)} each
                       </p>
                     </div>
                   </div>
@@ -2974,161 +2830,14 @@ export default function POSInterface() {
         </ScrollArea>
         </div>
 
-        {/* Customer Section - Available for All Order Types */}
-        <div className="p-5 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/20 dark:to-teal-950/20">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              <User className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Customer</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Link customer to earn loyalty points</p>
-            </div>
-          </div>
+        {/* Customer Section - Compact */}
+        <div className="p-2 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/20 dark:to-teal-950/20">
           <CustomerSearch
             onAddressSelect={setSelectedAddress}
             selectedAddress={selectedAddress}
             deliveryAreas={deliveryAreas}
             branchId={user?.role === 'ADMIN' ? selectedBranch : user?.branchId}
           />
-          {selectedAddress && (
-            <div className="space-y-3">
-              <div className="p-3 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    <span className="text-slate-700 dark:text-slate-300">
-                      <strong>{selectedAddress.customerName}</strong> - {selectedAddress.customerPhone}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => setShowAddAddressDialog(true)}
-                    size="sm"
-                    variant="outline"
-                    className="text-emerald-600 hover:bg-emerald-50 border-emerald-200 dark:border-emerald-800 dark:hover:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Address
-                  </Button>
-                </div>
-              </div>
-
-              {/* Promo Code Section */}
-              <div className="p-3 bg-orange-50 dark:bg-orange-950/30 rounded-xl border border-orange-200 dark:border-orange-800">
-                <div className="flex items-center gap-2 mb-2">
-                  <Tag className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  <span className="text-xs font-bold text-orange-700 dark:text-orange-300">
-                    Promo Code
-                  </span>
-                </div>
-                {promoCodeId ? (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                        <div>
-                          <p className="text-sm font-bold text-green-700 dark:text-green-300">
-                            {promoCode}
-                          </p>
-                          <p className="text-xs text-green-600 dark:text-green-400">
-                            Discount: {formatCurrency(promoDiscount, currency)}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={handleClearPromoCode}
-                        size="sm"
-                        variant="outline"
-                        className="h-9 w-9 p-0 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/50"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Input
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                        onKeyPress={(e) => e.key === 'Enter' && handleValidatePromoCode()}
-                        placeholder="Enter code..."
-                        className="flex-1 h-9 text-sm"
-                        disabled={validatingPromo}
-                      />
-                      <Button
-                        onClick={handleValidatePromoCode}
-                        disabled={validatingPromo || !promoCode.trim()}
-                        size="sm"
-                        className="bg-orange-600 hover:bg-orange-700 text-white h-9 px-3"
-                      >
-                        {validatingPromo ? (
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Check className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                  {promoMessage && !promoCodeId && (
-                    <p className="text-xs mt-2 text-red-600 dark:text-red-400">
-                      {promoMessage}
-                    </p>
-                  )}
-              </div>
-
-              {/* Loyalty Redemption Section */}
-              {redeemedPoints === 0 && selectedAddress?.loyaltyPoints !== undefined && selectedAddress.loyaltyPoints >= 100 && (
-                <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                      <div>
-                        <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                          {selectedAddress.loyaltyPoints.toFixed(0)} pts available
-                        </p>
-                        <p className="text-xs text-purple-600 dark:text-purple-400">
-                          Redeem 100 pts = 10 EGP off
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={handleRedeemPoints}
-                      size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
-                    >
-                      <Gift className="h-4 w-4 mr-2" />
-                      Redeem Points
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Active Redemption Display */}
-              {redeemedPoints > 0 && (
-                <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                      <div>
-                        <p className="text-sm font-bold text-green-700 dark:text-green-300">
-                          {redeemedPoints} pts redeemed
-                        </p>
-                        <p className="text-xs text-green-600 dark:text-green-400">
-                          Discount: {formatCurrency(loyaltyDiscount, currency)}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={handleClearRedemption}
-                      size="sm"
-                      variant="outline"
-                      className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/50"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Delivery Section - Only for Delivery Orders */}
@@ -3252,91 +2961,72 @@ export default function POSInterface() {
           </div>
         )}
 
-        {/* Order Summary */}
-        <div className="p-6 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900">
-          <div className="space-y-3 mb-5">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-400 font-medium">Subtotal</span>
+        {/* Order Summary - Compact */}
+        <div className="p-3 border-t border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-t from-slate-50/80 to-white dark:from-slate-800/80 dark:to-slate-900">
+          <div className="space-y-2 mb-3">
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
               <span className="font-bold text-slate-900 dark:text-white">
                 {formatCurrency(subtotal, currency)}
               </span>
             </div>
 
             {deliveryFee > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Delivery</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-600 dark:text-slate-400">Delivery</span>
                 <span className="font-bold text-slate-900 dark:text-white">
                   {formatCurrency(deliveryFee, currency)}
                 </span>
               </div>
             )}
-            {promoDiscount > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-orange-600 dark:text-orange-400 font-medium">Promo Discount</span>
+            {(promoDiscount > 0 || loyaltyDiscount > 0) && (
+              <div className="flex justify-between text-xs">
+                <span className="text-orange-600 dark:text-orange-400">Discount</span>
                 <span className="font-bold text-orange-600 dark:text-orange-400">
-                  -{formatCurrency(promoDiscount, currency)}
+                  -{formatCurrency(promoDiscount + loyaltyDiscount, currency)}
                 </span>
               </div>
             )}
-            {loyaltyDiscount > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-purple-600 dark:text-purple-400 font-medium">Loyalty Discount ({redeemedPoints} pts)</span>
-                <span className="font-bold text-purple-600 dark:text-purple-400">
-                  -{formatCurrency(loyaltyDiscount, currency)}
-                </span>
-              </div>
-            )}
-            <Separator className="bg-slate-200 dark:bg-slate-700 my-3" />
+            <Separator className="bg-slate-200 dark:bg-slate-700 my-2" />
             <div className="flex justify-between items-center">
-              <span className="text-lg font-bold text-slate-900 dark:text-white">Total</span>
-              <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
+              <span className="text-sm font-bold text-slate-900 dark:text-white">Total</span>
+              <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(total, currency)}
               </span>
             </div>
           </div>
 
-          {/* For Dine-In with table, show close table message instead of checkout buttons */}
-          {orderType === 'dine-in' && selectedTable ? (
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center">
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Items are held on Table {selectedTable.tableNumber}
-              </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                Click "Close Table" above to complete order and print receipt
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
+          {/* Checkout Buttons - Compact */}
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button
-                onClick={handleHoldOrder}
+                onClick={() => handleCheckout('cash')}
+                disabled={processing || currentCart.length === 0}
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/30 font-bold h-8 text-xs rounded-lg transition-all"
+              >
+                <DollarSign className="h-3.5 w-3.5 mr-1" />
+                Cash
+              </Button>
+              <Button
+                onClick={handleCardPaymentClick}
                 disabled={processing || currentCart.length === 0}
                 variant="outline"
-                className="w-full h-12 text-base font-semibold border-2 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-all"
+                className="border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold h-8 text-xs rounded-lg transition-all"
               >
-                <Pause className="h-4.5 w-4.5 mr-2" />
-                Hold Order
+                <CreditCard className="h-3.5 w-3.5 mr-1" />
+                Card
               </Button>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={() => handleCheckout('cash')}
-                  disabled={processing || currentCart.length === 0}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-xl shadow-emerald-500/30 font-bold h-12 text-base rounded-xl transition-all hover:shadow-emerald-500/40"
-                >
-                  <DollarSign className="h-4.5 w-4.5 mr-2" />
-                  Cash
-                </Button>
-                <Button
-                  onClick={handleCardPaymentClick}
-                  disabled={processing || currentCart.length === 0}
-                  variant="outline"
-                  className="border-2 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 font-bold h-12 text-base rounded-xl transition-all"
-                >
-                  <CreditCard className="h-4.5 w-4.5 mr-2" />
-                  Card
-                </Button>
-              </div>
             </div>
-          )}
+            <Button
+              onClick={handleHoldOrder}
+              disabled={processing || currentCart.length === 0}
+              variant="outline"
+              className="w-full h-8 text-xs font-semibold border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-all"
+            >
+              <Pause className="h-3.5 w-3.5 mr-1" />
+              Hold Order
+            </Button>
+          </div>
         </div>
       </div>
 
