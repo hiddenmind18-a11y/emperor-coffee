@@ -217,18 +217,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       showSuccessToast('Welcome back!', `Logged in as ${data.session.name || data.session.username}`);
 
+      // DISABLED: Auto-sync on login was causing 4.54 GB data transfers
+      // Users can manually sync via Sync Dashboard if needed
+      //
       // Sync data to IndexedDB if online and has branch
-      if (userData.branchId) {
-        setTimeout(async () => {
-          try {
-            console.log('[Auth] Pulling data for offline use...');
-            const syncResult = await offlineManager.syncAll();
-            console.log('[Auth] Sync result:', syncResult);
-          } catch (err) {
-            console.error('[Auth] Failed to sync data:', err);
-          }
-        }, 1000);
-      }
+      // if (userData.branchId) {
+      //   setTimeout(async () => {
+      //     try {
+      //       console.log('[Auth] Pulling data for offline use...');
+      //       const syncResult = await offlineManager.syncAll();
+      //       console.log('[Auth] Sync result:', syncResult);
+      //     } catch (err) {
+      //       console.error('[Auth] Failed to sync data:', err);
+      //     }
+      //   }, 1000);
+      // }
     } catch (err) {
       console.error('[Auth] Login error:', err);
       showErrorToast('Network Error', 'Failed to connect. Please check your internet connection.');

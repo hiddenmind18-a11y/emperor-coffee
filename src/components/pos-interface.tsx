@@ -394,7 +394,13 @@ export default function POSInterface() {
   );
 
   const { data: menuItemsData, loading: menuItemsLoading, refetch: refetchMenuItems } = useOfflineData(
-    `/api/menu-items/pos?branchId=${user?.role === 'ADMIN' ? selectedBranch : (user?.branchId || '')}`,
+    // Only fetch when we have a valid branchId
+    // This prevents loading ALL menu items for ALL branches (which causes 4GB+ data transfer)
+    (() => {
+      const branchId = user?.role === 'ADMIN' ? selectedBranch : user?.branchId;
+      if (!branchId) return null; // Don't fetch if no branchId
+      return `/api/menu-items/pos?branchId=${branchId}`;
+    })(),
     {
       fetchFromDB: offlineDataFetchers.menuItems,
       deps: [selectedBranch, user?.branchId, user?.role],

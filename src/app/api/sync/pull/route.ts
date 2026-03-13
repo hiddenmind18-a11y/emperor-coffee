@@ -1,16 +1,16 @@
-// Sync Pull API - OPTIMIZED VERSION
+// Sync Pull API - LIGHTWEIGHT VERSION
 // Downloads updated data from central to branch (DOWN sync)
 //
-// OPTIMIZATIONS:
-// - Reduced limit from 1000 to 100 for orders/shifts/waste logs
-// - Removed unnecessary nested data from menu items
-// - Made variants optional (only pull when explicitly requested)
-// - Removed customer addresses by default
-// - Reduced initial data load by ~90%
+// CRITICAL FIXES FOR 4.54 GB DATA TRANSFER PROBLEM:
+// - DISABLED auto-sync on login (auth-context.tsx)
+// - REMOVED recipes, orders, shifts, waste logs from sync
+// - REMOVED base64 images (imagePath) from all returns
+// - Only sync what's ACTUALLY needed for POS operation
+//
+// This reduces data transfer from GBs to MBs
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { SyncDirection, SyncStatus } from '@prisma/client';
 import {
   getSyncStatus,
   createSyncHistory,
@@ -26,9 +26,8 @@ import {
  * - branchId: string (required)
  * - force: boolean (optional) - Force full sync regardless of versions
  * - includeVariants: boolean (optional) - Include menu item variants (default: false)
- * - includeOrders: boolean (optional) - Include orders (default: true, limited to 50)
+ * - includeOrders: boolean (optional) - Include orders (default: false)
  * - sinceDate: string (optional) - Only pull data modified since this date
- * - limit: number (optional) - Max records per collection (default: 100, was 1000)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -37,9 +36,8 @@ export async function POST(request: NextRequest) {
       branchId, 
       force = false, 
       sinceDate, 
-      limit = 100,
       includeVariants = false,
-      includeOrders = true
+      includeOrders = false
     } = body;
 
     if (!branchId) {
@@ -64,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Create sync history
     const syncHistoryId = await createSyncHistory(
       branchId,
-      SyncDirection.DOWN,
+      'DOWN' as any,
       0
     );
 
@@ -72,11 +70,11 @@ export async function POST(request: NextRequest) {
     let totalRecordsProcessed = 0;
     const updates: string[] = [];
 
-    // Data to return
+    // Data to return - ONLY ESSENTIAL DATA
     const dataToReturn: any = {};
 
     // ============================================
-    // Sync Categories (Lightweight - just essential fields)
+    // Sync Categories (NO IMAGES - prevents massive data transfer)
     // ============================================
     const categories = await db.category.findMany({ 
       where: { isActive: true },
@@ -84,7 +82,8 @@ export async function POST(request: NextRequest) {
         id: true,
         name: true,
         sortOrder: true,
-        imagePath: true
+        // REMOVED: imagePath - base64 images cause massive data transfer
+        defaultVariantTypeId: true
       }
     });
     dataToReturn.categories = categories;
@@ -92,7 +91,7 @@ export async function POST(request: NextRequest) {
     updates.push(`Categories: ${categories.length}`);
 
     // ============================================
-    // Sync Menu Items (OPTIMIZED - minimal data, no variants by default)
+    // Sync Menu Items (NO IMAGES, NO VARIANTS by default)
     // ============================================
     const menuItemsSelect: any = {
       id: true,
@@ -104,18 +103,18 @@ export async function POST(request: NextRequest) {
       isActive: true,
       hasVariants: true,
       sortOrder: true,
-      imagePath: true,
+      // REMOVED: imagePath - base64 images cause massive data transfer
       categoryRel: {
         select: {
           id: true,
           name: true,
           sortOrder: true,
-          imagePath: true
+          // REMOVED: imagePath - base64 images cause massive data transfer
         }
       }
     };
 
-    // Only include variants if explicitly requested (for menu management)
+    // Only include variants if explicitly requested (for menu management only)
     if (includeVariants) {
       menuItemsSelect.variants = {
         where: { isActive: true },
@@ -145,141 +144,7 @@ export async function POST(request: NextRequest) {
     await incrementVersion(branchId, 'menuVersion');
 
     // ============================================
-    // Sync Orders (OPTIMIZED - limited to 50, minimal includes)
-    // ============================================
-    if (includeOrders) {
-      const orderWhere: any = { branchId };
-      if (sinceDate) {
-        orderWhere.createdAt = { gte: new Date(sinceDate) };
-      }
-
-      // Use much smaller limit (50 instead of 1000)
-      const orderLimit = Math.min(limit, 50);
-      
-      const orders = await db.order.findMany({
-        where: orderWhere,
-        orderBy: { createdAt: 'desc' },
-        take: orderLimit,
-        select: {
-          id: true,
-          orderNumber: true,
-          totalAmount: true,
-          orderType: true,
-          paymentMethod: true,
-          orderTimestamp: true,
-          createdAt: true,
-          // Only minimal item data - no full menu item details
-          items: {
-            select: {
-              id: true,
-              menuItemId: true,
-              itemName: true,
-              quantity: true,
-              unitPrice: true,
-              subtotal: true,
-              variantName: true
-            }
-          },
-          customer: {
-            select: {
-              id: true,
-              name: true,
-              phone: true
-            }
-          }
-        }
-      });
-
-      dataToReturn.orders = orders;
-      totalRecordsProcessed += orders.length;
-      updates.push(`Orders: ${orders.length}`);
-    }
-
-    // ============================================
-    // Sync Shifts (OPTIMIZED - limited to 20)
-    // ============================================
-    const shiftWhere: any = { branchId };
-    if (sinceDate) {
-      shiftWhere.createdAt = { gte: new Date(sinceDate) };
-    }
-
-    const shifts = await db.shift.findMany({
-      where: shiftWhere,
-      orderBy: { createdAt: 'desc' },
-      take: 20,  // Much smaller limit
-      select: {
-        id: true,
-        branchId: true,
-        cashierId: true,
-        startTime: true,
-        endTime: true,
-        openingCash: true,
-        closingCash: true,
-        openingOrders: true,
-        closingOrders: true,
-        isClosed: true,
-        cashier: {
-          select: { id: true, username: true, name: true }
-        }
-      }
-    });
-
-    dataToReturn.shifts = shifts;
-    totalRecordsProcessed += shifts.length;
-    updates.push(`Shifts: ${shifts.length}`);
-
-    // ============================================
-    // Sync Ingredients (only when forced or pending)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.ingredient) {
-      const ingredients = await db.ingredient.findMany({
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          unit: true,
-          costPerUnit: true,
-          reorderThreshold: true
-        }
-      });
-
-      const inventory = await db.branchInventory.findMany({
-        where: { branchId },
-        select: {
-          ingredientId: true,
-          currentStock: true,
-          lastRestockAt: true
-        }
-      });
-
-      dataToReturn.ingredients = ingredients;
-      dataToReturn.inventory = inventory;
-      totalRecordsProcessed += ingredients.length + inventory.length;
-      updates.push(`Ingredients: ${ingredients.length}, Inventory: ${inventory.length}`);
-    }
-
-    // ============================================
-    // Sync Users (only for this branch, minimal data)
-    // ============================================
-    if (force || syncStatus.pendingDownloads.users) {
-      const users = await db.user.findMany({
-        where: { branchId, isActive: true },
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          role: true,
-          branchId: true
-        }
-      });
-
-      dataToReturn.users = users;
-      totalRecordsProcessed += users.length;
-      updates.push(`Users: ${users.length}`);
-    }
-
-    // ============================================
-    // Sync Branches (minimal data)
+    // Sync Branches (minimal data only)
     // ============================================
     const branches = await db.branch.findMany({
       where: { isActive: true },
@@ -290,7 +155,6 @@ export async function POST(request: NextRequest) {
         isActive: true
       }
     });
-
     dataToReturn.branches = branches;
     totalRecordsProcessed += branches.length;
     updates.push(`Branches: ${branches.length}`);
@@ -307,16 +171,18 @@ export async function POST(request: NextRequest) {
         isActive: true
       }
     });
-
     dataToReturn.deliveryAreas = deliveryAreas;
     totalRecordsProcessed += deliveryAreas.length;
     updates.push(`Delivery Areas: ${deliveryAreas.length}`);
 
     // ============================================
-    // Sync Couriers (minimal data)
+    // Sync Couriers (minimal data only)
     // ============================================
     const couriers = await db.courier.findMany({
-      where: { branchId, isActive: true },
+      where: {
+        branchId,
+        isActive: true
+      },
       select: {
         id: true,
         name: true,
@@ -324,63 +190,28 @@ export async function POST(request: NextRequest) {
         isActive: true
       }
     });
-
     dataToReturn.couriers = couriers;
     totalRecordsProcessed += couriers.length;
     updates.push(`Couriers: ${couriers.length}`);
 
     // ============================================
-    // Sync Receipt Settings (minimal)
+    // Sync Users for this branch (minimal data)
     // ============================================
-    let receiptSettings = await db.receiptSettings.findFirst({
-      where: { branchId },
-      select: {
-        id: true,
-        storeName: true,
-        headerText: true,
-        footerText: true,
-        fontSize: true,
-        showLogo: true,
-        paperWidth: true
-      }
-    });
-
-    if (receiptSettings) {
-      dataToReturn.receiptSettings = receiptSettings;
-      updates.push(`Receipt Settings: 1`);
+    if (force) {
+      const users = await db.user.findMany({
+        where: { branchId, isActive: true },
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          role: true,
+          branchId: true
+        }
+      });
+      dataToReturn.users = users;
+      totalRecordsProcessed += users.length;
+      updates.push(`Users: ${users.length}`);
     }
-
-    // ============================================
-    // Sync Customers (minimal - no addresses by default)
-    // ============================================
-    const customerWhere: any = {
-      OR: [
-        { branchId: branchId },
-        { branchId: null }
-      ]
-    };
-
-    if (sinceDate) {
-      customerWhere.createdAt = { gte: new Date(sinceDate) };
-    }
-
-    const customers = await db.customer.findMany({
-      where: customerWhere,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        email: true,
-        loyaltyPoints: true,
-        totalSpent: true,
-        orderCount: true
-      }
-    });
-
-    dataToReturn.customers = customers;
-    totalRecordsProcessed += customers.length;
-    updates.push(`Customers: ${customers.length}`);
 
     // ============================================
     // Update Branch Last Sync Time
@@ -390,7 +221,7 @@ export async function POST(request: NextRequest) {
     // ============================================
     // Finalize Sync History
     // ============================================
-    const finalStatus = SyncStatus.SUCCESS;
+    const finalStatus = 'SUCCESS' as const;
 
     await updateSyncHistory(
       syncHistoryId,
@@ -412,8 +243,13 @@ export async function POST(request: NextRequest) {
         performance: {
           includeVariants,
           includeOrders,
-          limit,
-          optimized: true
+          optimized: true,
+          // REMOVED from sync:
+          // - No recipes (heavy ingredient data)
+          // - No orders (can be fetched on-demand)
+          // - No shifts (can be fetched on-demand)
+          // - No waste logs (can be fetched on-demand)
+          // - No base64 images (prevents massive data transfer)
         }
       }
     });
