@@ -48,7 +48,7 @@ export function useOfflineData<T>(
     }
 
     // Check in-memory cache first for menu items and categories
-    if (useCache && !hasFetchedRef.current) {
+    if (useCache && !hasFetchedRef.current && apiEndpoint) {
       if (apiEndpoint.includes('/api/menu-items')) {
         const { menuCache } = await import('@/lib/menu-cache');
         const cachedItems = menuCache.getMenuItems();
@@ -70,7 +70,7 @@ export function useOfflineData<T>(
       }
     }
 
-    // Skip API call if apiEndpoint is empty - use offline data only
+    // Skip API call if apiEndpoint is empty or null - use offline data only
     const shouldSkipAPI = !apiEndpoint || apiEndpoint.trim() === '';
 
     // Better offline detection
@@ -107,9 +107,10 @@ export function useOfflineData<T>(
         console.log(`[useOfflineData] Fetching from API: ${apiEndpoint}`);
 
         // Add branchId to URL if provided
-        const url = branchId && !apiEndpoint.includes('branchId=')
-          ? `${apiEndpoint}${apiEndpoint.includes('?') ? '&' : '?'}branchId=${branchId}`
-          : apiEndpoint;
+        let url = apiEndpoint;
+        if (branchId && apiEndpoint && !apiEndpoint.includes('branchId=')) {
+          url = `${apiEndpoint}${apiEndpoint.includes('?') ? '&' : '?'}branchId=${branchId}`;
+        }
 
         const response = await fetch(url);
 
@@ -120,7 +121,7 @@ export function useOfflineData<T>(
           console.log(`[useOfflineData] API fetch successful: ${apiEndpoint}`);
 
           // Update in-memory cache for menu items and categories
-          if (useCache) {
+          if (useCache && apiEndpoint) {
             if (apiEndpoint.includes('/api/menu-items') && Array.isArray(data)) {
               const { menuCache } = await import('@/lib/menu-cache');
               menuCache.setMenuItems(data);
@@ -132,47 +133,47 @@ export function useOfflineData<T>(
           }
 
           // Also save to IndexedDB for offline use (in background, don't wait)
-          if (apiEndpoint.includes('/api/categories')) {
+          if (apiEndpoint && apiEndpoint.includes('/api/categories')) {
             indexedDBStorage.batchSaveCategories(Array.isArray(data) ? data : []).catch(e =>
               console.log('[useOfflineData] Failed to cache categories:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/menu-items')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/menu-items')) {
             indexedDBStorage.batchSaveMenuItems(Array.isArray(data) ? data : []).catch(e =>
               console.log('[useOfflineData] Failed to cache menu items:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/branches')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/branches')) {
             indexedDBStorage.batchSaveBranches(Array.isArray(data) ? data : (data.branches || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache branches:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/delivery-areas')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/delivery-areas')) {
             indexedDBStorage.batchSaveDeliveryAreas(Array.isArray(data) ? data : (data.areas || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache delivery areas:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/couriers')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/couriers')) {
             indexedDBStorage.batchSaveCouriers(Array.isArray(data) ? data : (data.couriers || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache couriers:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/customers')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/customers')) {
             indexedDBStorage.batchSaveCustomers(Array.isArray(data) ? data : (data.customers || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache customers:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/users')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/users')) {
             indexedDBStorage.batchSaveUsers(Array.isArray(data) ? data : (data.users || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache users:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/shifts')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/shifts')) {
             indexedDBStorage.batchSaveShifts(Array.isArray(data) ? data : (data.shifts || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache shifts:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/promo-codes')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/promo-codes')) {
             indexedDBStorage.batchSavePromoCodes(Array.isArray(data) ? data : (data.promoCodes || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache promo codes:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/tables')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/tables')) {
             indexedDBStorage.batchSaveTables(Array.isArray(data) ? data : (data.tables || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache tables:', e.message)
             );
-          } else if (apiEndpoint.includes('/api/inventory')) {
+          } else if (apiEndpoint && apiEndpoint.includes('/api/inventory')) {
             indexedDBStorage.batchSaveInventory(Array.isArray(data) ? data : (data.inventory || [])).catch(e =>
               console.log('[useOfflineData] Failed to cache inventory:', e.message)
             );
@@ -207,7 +208,7 @@ export function useOfflineData<T>(
             console.log(`[useOfflineData] IndexedDB fallback successful: ${apiEndpoint || '(none)'}`);
 
             // Update in-memory cache from IndexedDB fallback
-            if (useCache) {
+            if (useCache && apiEndpoint) {
               if (apiEndpoint.includes('/api/menu-items') && Array.isArray(dbData)) {
                 const { menuCache } = await import('@/lib/menu-cache');
                 menuCache.setMenuItems(dbData);
