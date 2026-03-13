@@ -19,7 +19,7 @@ import {
   TrendingUp, AlertTriangle, Grid, Filter, Menu as MenuIcon,
   Sparkles, Bell, Layers, Wallet, Calendar, Barcode, Receipt, Utensils,
   ChevronRight, Tag, Gift, ShoppingBag, RefreshCw, Check, Info,
-  PanelLeftClose, PanelLeftOpen, Users, MessageSquare, Edit3, Smartphone, Pause, Play, Calculator, ArrowRight
+  PanelLeftClose, PanelLeftOpen, Users, MessageSquare, Edit3, Smartphone, Pause, Play, Calculator, ArrowRight, Settings
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n-context';
 import { formatCurrency } from '@/lib/utils';
