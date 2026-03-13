@@ -44,13 +44,14 @@ export async function GET(request: NextRequest) {
           taxRate: true,
           hasVariants: true,
           sortOrder: true,
-          imagePath: true,
+          // REMOVED: imagePath - base64 images cause massive data transfer (4.22 GB!)
+          // POS doesn't need images embedded in JSON - they should be loaded as separate URLs
           categoryRel: {
             select: {
               id: true,
               name: true,
               sortOrder: true,
-              imagePath: true,
+              // REMOVED: imagePath - base64 images cause massive data transfer
             },
           },
         },
