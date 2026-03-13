@@ -106,11 +106,20 @@ class OfflineManager {
 
       console.log('[OfflineManager] Initialized - Online:', this.isOnline, 'Branch:', branchId);
 
-      // If online, start auto-sync (but skip the first interval to avoid race with manual sync)
-      if (this.isOnline) {
-        this.skipFirstAutoSync = true; // Skip first auto-sync interval
-        this.startAutoSync();
-      } else {
+      // DISABLED: Auto-sync causes massive data transfers and timeouts
+      // Users can manually sync by clicking the "Sync" button
+      //
+      // // If online, start auto-sync (but skip the first interval to avoid race with manual sync)
+      // if (this.isOnline) {
+      //   this.skipFirstAutoSync = true; // Skip first auto-sync interval
+      //   this.startAutoSync();
+      // } else {
+      //   this.notifyListeners(SyncStatus.OFFLINE, { message: 'You are offline' });
+      // }
+      //
+      // Instead, we'll let components fetch only the data they need via useOfflineData hook
+
+      if (!this.isOnline) {
         this.notifyListeners(SyncStatus.OFFLINE, { message: 'You are offline' });
       }
     })();
